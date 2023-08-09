@@ -119,7 +119,7 @@ class FrozenLakeMod(ogym.Wrapper):
             if s == num_states-1:
                 print('+---'*n + '+\n')
 
-    def display_values(self, V, digits=3, cell_width=40, cell_height=24):
+    def display_values(self, V, digits=3, cell_width=50, cell_height=36):
         import numpy as np
         import pandas as pd
         from IPython.display import display, HTML
