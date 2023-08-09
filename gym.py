@@ -119,7 +119,7 @@ class FrozenLakeMod(ogym.Wrapper):
             if s == num_states-1:
                 print('+---'*n + '+\n')
 
-    def display_values(self, V, digits=3, cell_width=40):
+    def display_values(self, V, digits=3, cell_width=40, cell_height=24):
         import numpy as np
         import pandas as pd
         from IPython.display import display, HTML
@@ -130,7 +130,7 @@ class FrozenLakeMod(ogym.Wrapper):
         display(HTML('<b>State-Value Function</b>'))
         #print(V_array)
         
-        html = '<table >'
+        html = '<table style="border-spacing: 0px; text-align: center">'
         for r in range(V_array.shape[0]):
             html += '<tr>'
             for c in range(V_array.shape[1]):
@@ -142,7 +142,7 @@ class FrozenLakeMod(ogym.Wrapper):
                     bgc = 'LightGreen'
                 elif len(self.env.P[state][0]) == 1:
                     bgc = '#bbbbbb'
-                html += f'<td width={cell_width}, '
+                html += f'<td width={cell_width}, height={cell_height}, '
                 html += f'style="border-style:solid; border-width:thin; background-color: {bgc}">'
                 html += f'<b><center>{V_array[r,c]}</center></b></td>'
             html += '</td>'
