@@ -151,7 +151,7 @@ class FrozenLakeMod(ogym.Wrapper):
 class CartPoleMod(ogym.Wrapper):
     
     def __init__(self, env, max_angle=1.57, num_bins=None, 
-                 coord_max=[2.4, 3.5, 0.21, 7], sqrt_trans=False, record_states=False):
+                 coord_max=[2, 2.5, 0.21, 5], sqrt_trans=False, record_states=False):
         
         self.env = env
         self.max_angle = max_angle
