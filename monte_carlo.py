@@ -24,7 +24,8 @@ class MCAgent:
 
         
     def select_action(self, state):
-        #state = str(state)
+        from rltools.utils import encode_state
+        state = encode_state(state)
         if state in self.policy.keys():
             return self.policy[state]
         return self.env.action_space.sample()
@@ -131,7 +132,7 @@ class MCAgent:
         
         import numpy as np
         from tqdm.auto import tqdm
-        from rltools.utils import generate_episode, evaluate, decode_state
+        from rltools.utils import generate_episode, evaluate, encode_state, decode_state
         from rltools.utils import set_seed, unset_seed
         
         #------------------------------------------------------------
@@ -208,7 +209,10 @@ class MCAgent:
                 # Get state/action pair and exit if already visited
                 #------------------------------------------------------------
                 st, at = history['states'][t], history['actions'][t]
-                #st = str(st)
+                
+                # Encode state
+                st = encode_state(st)
+                
                 if (st,at) in visited:
                     continue
 

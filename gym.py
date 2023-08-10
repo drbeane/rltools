@@ -14,8 +14,7 @@ def make(
         if max_angle is None: max_angle=1.57
         env.spec.disable_env_checker = True
         env = CartPoleMod(env=env, num_bins=num_bins, sqrt_trans=sqrt_trans, 
-                          max_angle=max_angle, coord_max=coord_max,
-                          record_states=record_states)
+                          max_angle=max_angle, record_states=record_states)
     elif name == 'Blackjack-v1':
         env = BlackjackMod(env=env)
     elif name == 'Taxi-v3':
@@ -151,7 +150,9 @@ class FrozenLakeMod(ogym.Wrapper):
 class CartPoleMod(ogym.Wrapper):
     
     def __init__(self, env, max_angle=1.57, num_bins=None, 
-                 coord_max=[2, 2.5, 0.21, 5], sqrt_trans=False, record_states=False):
+                 sqrt_trans=False, record_states=False):
+        
+        coord_max=[2, 2.5, 0.21, 5]
         
         self.env = env
         self.max_angle = max_angle

@@ -391,6 +391,9 @@ def generate_episode(
     
     
 def state_str(env, state):
+    '''
+    Represents states as strings for the sake of displaying them in reports. 
+    '''
     import numpy as np
     np.set_printoptions(suppress=True)
     if env.spec.id == 'CartPole-v1':
@@ -400,6 +403,12 @@ def state_str(env, state):
     return ss
 
 def encode_state(state):
+    '''
+    Encodes states for use as keys in dictionaries. 
+    -- Lists --> Tuples
+    -- Arrays --> Bytes
+    -- Integers/Floats/Strings --> Unaffected
+    '''
     import numpy as np
     if type(state) == list: return tuple(state)
     if isinstance(state, np.ndarray): return state.tobytes()
