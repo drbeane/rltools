@@ -151,15 +151,27 @@ class CartPoleMod(ogym.Wrapper):
     
     def __init__(self, env, max_angle=1.57, num_bins=None, 
                  sqrt_trans=False, record_states=False):
-        
-        coord_max=[2, 2.5, 0.21, 5]
+        import numpy as np
         
         self.env = env
         self.max_angle = max_angle
         self.num_bins = num_bins
         
-        self.coord_max = coord_max
+        self.coord_max = [2, 2.5, 0.21, 5]
         self.sqrt_trans = sqrt_trans
+        
+        if num_bins is not None:
+            num_cuts = num_bins - 1
+        
+            m0, m1, m2, m3 = self.coord_max
+            if self.sqrt_trans:
+                m0, m1, m2, m3 = m0**0.5, m1**0.5, m2**0.5, m3**0.5
+                
+            self.bins0 = np.linspace(-m0, m0, num_cuts)
+            self.bins1 = np.linspace(-m1, m1, num_cuts)
+            self.bins2 = np.linspace(-m2, m2, num_cuts)
+            self.bins3 = np.linspace(-m3, m3, num_cuts)
+            
         
         self.record_states = record_states
         if record_states:
@@ -171,27 +183,15 @@ class CartPoleMod(ogym.Wrapper):
     def digitize_state(self, state):
         import numpy as np
         
-        num_cuts = self.num_bins - 1
-        
-        m0, m1, m2, m3 = self.coord_max
         s0, s1, s2, s3 = state
-        
         if self.sqrt_trans:
-            m0, m1, m2, m3 = m0**0.5, m1**0.5, m2**0.5, m3**0.5
-            s0, s1, s2, s3 = [
-                abs(s)**0.5 if s > 0 else -abs(s)**0.5 for s in state
-            ]
-        
-        bins0 = np.linspace(-m0, m0, num_cuts)
-        bins1 = np.linspace(-m1, m1, num_cuts)
-        bins2 = np.linspace(-m2, m2, num_cuts)
-        bins3 = np.linspace(-m3, m3, num_cuts)
-        
+            s0, s1, s2, s3 = [abs(s)**0.5 if s > 0 else -abs(s)**0.5 for s in state]
+                
         dig_state = np.zeros(4)
-        dig_state[0] = np.digitize(s0, bins0)
-        dig_state[1] = np.digitize(s1, bins1)
-        dig_state[2] = np.digitize(s2, bins2)
-        dig_state[3] = np.digitize(s3, bins3)
+        dig_state[0] = np.digitize(s0, self.bins0)
+        dig_state[1] = np.digitize(s1, self.bins1)
+        dig_state[2] = np.digitize(s2, self.bins2)
+        dig_state[3] = np.digitize(s3, self.bins3)
         dig_state = dig_state.astype(int)
         
         if self.record_states:

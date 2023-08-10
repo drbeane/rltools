@@ -266,6 +266,7 @@ def generate_episode(
     epsilon=0.0, seed=None, verbose=False, vec_env=False):
     
     import numpy as np
+    import time
     
     #--------------------------------------------------------
     # Set seeds
@@ -277,7 +278,6 @@ def generate_episode(
     else:
         state, info = env.reset(seed=int(seed))
         env.action_space.seed(int(seed))
-    
 
     #--------------------------------------------------------
     # Set initial state
@@ -333,6 +333,7 @@ def generate_episode(
         else:
             state, reward, done, truncated, info = env.step(action)
         
+        t0 = time.time()
         a_list.append(action)
         s_list.append(state)
         r_list.append(reward)

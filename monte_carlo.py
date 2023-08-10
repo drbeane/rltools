@@ -135,6 +135,7 @@ class MCAgent:
         from rltools.utils import generate_episode, evaluate, encode_state, decode_state
         from rltools.utils import set_seed, unset_seed
         
+        
         #------------------------------------------------------------
         # Set the seed
         #------------------------------------------------------------
@@ -178,7 +179,7 @@ class MCAgent:
             if exploring_starts and len(self.Q) > 0:
                 init_state = np.random.choice(list(self.Q.keys())) 
                 init_state = decode_state(self.env, init_state)
-                
+            
             #------------------------------------------------------------
             # Generate episode using policy. 
             #------------------------------------------------------------
@@ -197,12 +198,12 @@ class MCAgent:
             for t in reversed(range(num_steps)):
                 Gt = history['rewards'][t] + self.gamma * Gt
                 returns.insert(0, Gt)
-
             
             #------------------------------------------------------------
             # Loop over episode, updating Q estimate
             #------------------------------------------------------------
             visited = set()
+            updated = set()
             for t in range(num_steps):
                 
                 #------------------------------------------------------------
@@ -215,6 +216,8 @@ class MCAgent:
                 
                 if (st,at) in visited:
                     continue
+                
+                updated.add(st)
 
                 #------------------------------------------------------------
                 # Update visit information
@@ -233,7 +236,7 @@ class MCAgent:
                 if alpha is None: 
                     self.Q[st][at] = Qsa + (Gt - Qsa) / visit_counts[(st,at)]
                 else:
-                    self.Q[st][at] = Qsa + alpha * (Gt - Qsa)
+                    self.Q[st][at] = Qsa + alpha * (Gt - Qsa) 
     
             #------------------------------------------------------------
             # Decay alpha and epsilon
@@ -246,7 +249,8 @@ class MCAgent:
             #------------------------------------------------------------
             # Update V and policy
             #------------------------------------------------------------
-            for s in self.Q.keys():
+            #for s in self.Q.keys():
+            for s in updated:
                 self.V[s] = np.max(self.Q[s])
                 self.policy[s] = np.argmax(self.Q[s])
 
@@ -269,6 +273,7 @@ class MCAgent:
                     out += f'{stats["sr"]:>14.4f}'
                 if verbose:
                     print(out)
+                np.set_printoptions(suppress=True)
                 
                 #------------------------------------------------------------
                 # Check for new best model
