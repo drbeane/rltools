@@ -63,9 +63,6 @@ class FrozenLakeMod(ogym.Wrapper):
             else:
                 self.status = 'failed'
         
-        #if self.status == 'success':
-        #    print('SUCCESS!')
-        
         return state, reward, terminated, truncated, info
 
     def set_T(self, T):
@@ -85,13 +82,13 @@ class FrozenLakeMod(ogym.Wrapper):
                 else: reward = self.rew_struct[2]
 
                 T[i] = (prob, next_state, reward, terminal)
+                
         return T
 
     def set_transitions(self):
     
         states = range(self.observation_space.n)
         actions =  range(4)
-
         
         for s in states:
             for a in actions:
@@ -208,8 +205,6 @@ class CartPoleMod(ogym.Wrapper):
                 self.state_visits[i].append(state[i])
         
 
-    
-    
     def reset(self, seed=None):
         state, info = super().reset(seed=seed)
         if self.record_states:

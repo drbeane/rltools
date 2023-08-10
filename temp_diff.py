@@ -163,7 +163,7 @@ class TDAgent:
                 #------------------------------------------------------------
                 # Check for new best model
                 #------------------------------------------------------------
-                score = stats['mean_length'] - stats['stdev_length']
+                score = stats['mean_return'] - stats['stdev_return']
                 if score > best_score:
                     best_score = score
                     best_pi = self.policy.copy()

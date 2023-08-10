@@ -111,6 +111,7 @@ class DPAgent:
         Assumes that Q and V have been estimated for policy. 
         '''
         import numpy as np
+        self.calculate_Q()
         self.policy = {s : np.argmax(self.Q[s]) for s in self.states}
        
         
@@ -133,7 +134,7 @@ class DPAgent:
             
             # Policy Improvement
             self.policy_improvement()
-            self.calculate_Q()
+            #self.calculate_Q()
             
             # Check for convergence
             if old_policy == self.policy:
