@@ -22,9 +22,13 @@ def render_mp4(videopath):
 
 
 class SB3Agent:
-    def __init__(self, model): 
+    def __init__(self, model, seed=None): 
         self.model = model
+        self.seed = seed
     def select_action(self, state):
+        if self.seed is not None:
+            from stable_baselines3.common.utils import set_random_seed
+            set_random_seed(self.seed)
         return self.model.predict(state)[0]
 
 class RandomAgent:
@@ -149,8 +153,8 @@ def create_gif(
     np_state = set_seed(seed)
     state, info = env.reset(seed=seed)
     env.action_space.seed(seed)
-    if seed is not None:
-        torch.manual_seed(seed)
+    #if seed is not None:
+    #    torch.manual_seed(seed)
 
 
     frames = []
