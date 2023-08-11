@@ -144,14 +144,19 @@ def create_gif(
 
             
     #-----------------------------------------------------------------------
-    # Set seeds, if needed. Note: Seed not yet passed to agent. 
+    # Set seeds.
     #-----------------------------------------------------------------------    
-    if seed is None:
-        state, info = env.reset()
-    else:
-        state, info = env.reset(seed=seed)
-        env.action_space.seed(seed)
-        torch.manual_seed(seed)
+    np_state = set_seed(seed)
+    state, info = env.reset(seed=seed)
+    env.action_space.seed(seed)
+    
+    
+    #if seed is None:
+    #    state, info = env.reset()
+    #else:
+    #    state, info = env.reset(seed=seed)
+    #    env.action_space.seed(seed)
+    #    torch.manual_seed(seed)
 
     frames = []
     frames.append(processor(env.render()) )
@@ -184,6 +189,11 @@ def create_gif(
         with open(f'{folder}/{filename}.gif','rb') as f:
             display(Image(data=f.read(), format='png'))
 
+    #------------------------------------------------------------
+    # Unset the seed
+    #------------------------------------------------------------
+    unset_seed(np_state)
+        
 
 def create_gif_old(
     env, agent=None, actions=None, episodes=1, max_steps=250, seed=None, fps=None, vec_env=False,
@@ -416,6 +426,7 @@ def encode_state(state):
     return state
 
 def decode_state(env, state):
+    import numpy as np
     if env.spec.id == 'FrozenLake-v1':
         return int(state)
     

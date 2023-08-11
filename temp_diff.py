@@ -31,7 +31,7 @@ class TDAgent:
 
 
     def q_learning(self, episodes, max_steps=None, alpha=0.1, alpha_decay=0.0,
-                   epsilon=0.0, epsilon_decay=0.0, seed=None, show_progress=True,
+                   epsilon=0.0, epsilon_decay=0.0, seed=None, show_progress=False,
                    updates=None, eval_eps=100, check_success=False, 
                    alphas=None, epsilons=None, exploring_starts=False, 
                    restore_best=True, return_best=False, verbose=True

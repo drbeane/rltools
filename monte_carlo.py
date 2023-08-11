@@ -32,7 +32,7 @@ class MCAgent:
    
    
     def prediction(self, policy, episodes, max_steps=None, alpha=None, alpha_decay=0.0, 
-                   epsilon=0.0, epsilon_decay=0.0, seed=None, show_progress=True):
+                   epsilon=0.0, epsilon_decay=0.0, seed=None, show_progress=False):
         '''
         Evaluates the policy currenty attached to the agent. 
         '''
@@ -125,7 +125,7 @@ class MCAgent:
 
 
     def control(self, episodes, max_steps=None, alpha=None, alpha_decay=0.0, 
-                epsilon=0.0, epsilon_decay=0.0, seed=None, show_progress=True, 
+                epsilon=0.0, epsilon_decay=0.0, seed=None, show_progress=False, 
                 updates=None, eval_eps=100, check_success=False, track_V=False,
                 restore_best=True, return_best=False, alphas=None, epsilons=None, 
                 exploring_starts=False, verbose=True):
