@@ -148,7 +148,7 @@ def create_gif(
 
             
     #-----------------------------------------------------------------------
-    # Set seeds.
+    # Set seeds
     #-----------------------------------------------------------------------    
     np_state = set_seed(seed)
     state, info = env.reset(seed=seed)
@@ -182,7 +182,7 @@ def create_gif(
     except:
         pass
     os.makedirs(folder, exist_ok=True)
-    imageio.mimsave(f'{folder}/{filename}.gif', frames, format='GIF', fps=fps)   
+    imageio.mimsave(f'{folder}/{filename}.gif', frames, format='GIF', duration=1/fps)   
 
     if display_gif:
         with open(f'{folder}/{filename}.gif','rb') as f:
