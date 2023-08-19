@@ -182,7 +182,7 @@ def create_gif(
     except:
         pass
     os.makedirs(folder, exist_ok=True)
-    imageio.mimsave(f'{folder}/{filename}.gif', frames, format='GIF', duration=1/fps)   
+    imageio.mimsave(f'{folder}/{filename}.gif', frames, format='GIF', duration=1000/fps, loop=0)   
 
     if display_gif:
         with open(f'{folder}/{filename}.gif','rb') as f:
