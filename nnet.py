@@ -27,7 +27,7 @@ class NNet(nn.Module):
 
     def predict_proba(self, x):
         with torch.no_grad():
-            logits = self.forward(x).numpy()
+            logits = self.forward(x)
             probs = F.softmax(logits, dim=-1)
             probs = probs.detach().numpy()
         return probs
