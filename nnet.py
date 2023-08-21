@@ -35,8 +35,7 @@ class NNet(nn.Module):
     def predict(self, x):
         with torch.no_grad():
             logits = self.forward(x).numpy()
-            probs = nn.Softmax(logits, dim=-1)
-        return np.argmax(probs, axis=1)
+        return np.argmax(logits, axis=1)
 
     def train_model(self, X, y, epochs, batch_size, lr, val_split, seed, updates=1):
         import math
