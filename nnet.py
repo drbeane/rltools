@@ -37,10 +37,11 @@ class NNet(nn.Module):
             logits = self.forward(x).numpy()
         return np.argmax(logits, axis=1)
 
-    def train_model(self, X, y, epochs, batch_size, lr, val_split, seed, updates=1):
+    def train_model(self, X, y, epochs, batch_size, lr, val_split, seed=None, updates=1):
         import math
-        torch.manual_seed(seed)
-        np.random.seed(seed)
+        if seed is not None:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
 
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
