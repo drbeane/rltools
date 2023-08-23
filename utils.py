@@ -202,7 +202,8 @@ def create_gif(
     #------------------------------------------------------------
     # Unset the seed
     #------------------------------------------------------------
-    unset_seed(np_state)
+    if vec_env == False:
+        unset_seed(np_state)
         
 
 def create_gif_old(
