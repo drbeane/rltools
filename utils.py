@@ -150,12 +150,14 @@ def create_gif(
     #-----------------------------------------------------------------------
     # Set seeds
     #-----------------------------------------------------------------------    
-    if seed is not None:
+    if vec_env:
+        state = env.reset()
+    else:
         np_state = set_seed(seed)
         state, info = env.reset(seed=seed)
         env.action_space.seed(seed)
-    else:
-        state, info = env.reset()
+    #else:
+    #    state, info = env.reset()
         
     #if seed is not None:
     #    torch.manual_seed(seed)
@@ -171,8 +173,13 @@ def create_gif(
             action = agent.select_action(state)
         else: 
             action = actions[t-1]
-        action = [action] if vec_env else action
-        state, reward, terminated, truncated, info = env.step(action)
+        
+        
+        #action = [action] if vec_env else action
+        if vec_env:
+            state, reward, terminated, info = env.step(action)
+        else:          
+            state, reward, terminated, truncated, info = env.step(action)
         frames.append(processor(env.render()))
         if terminated:
             break
