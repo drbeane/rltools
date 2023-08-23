@@ -461,7 +461,6 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
     len_success = 0
     len_failure = 0
     
-    print('hello')
     for n in range(episodes):
         ep_seed = np.random.choice(10**6)
         history = generate_episode(
