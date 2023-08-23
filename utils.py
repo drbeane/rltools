@@ -150,9 +150,13 @@ def create_gif(
     #-----------------------------------------------------------------------
     # Set seeds
     #-----------------------------------------------------------------------    
-    np_state = set_seed(seed)
-    state, info = env.reset(seed=seed)
-    env.action_space.seed(seed)
+    if seed is not None:
+        np_state = set_seed(seed)
+        state, info = env.reset(seed=seed)
+        env.action_space.seed(seed)
+    else:
+        state, info = env.reset
+        
     #if seed is not None:
     #    torch.manual_seed(seed)
 
