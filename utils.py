@@ -347,6 +347,7 @@ def generate_episode(
         #--------------------------------------------------------
         if vec_env:
             state, reward, done, info = env.step(action)
+            truncated = False
         else:
             state, reward, done, truncated, info = env.step(action)
         
