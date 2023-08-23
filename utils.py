@@ -346,7 +346,7 @@ def generate_episode(
         # Apply action
         #--------------------------------------------------------
         if vec_env:
-            state, reward, done, info = env.step([action])
+            state, reward, done, info = env.step(action)
         else:
             state, reward, done, truncated, info = env.step(action)
         
@@ -438,7 +438,8 @@ def decode_state(env, state):
         return int(state)
     
 
-def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, check_success=False, vec_env=False):
+def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, 
+             check_success=False, vec_env=False):
     import numpy as np
     
     np_state = set_seed(seed)
@@ -451,12 +452,12 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, check_succe
     len_success = 0
     len_failure = 0
     
-    
+    print('hello')
     for n in range(episodes):
         ep_seed = np.random.choice(10**6)
         history = generate_episode(
             env=env, agent=agent, max_steps=max_steps, 
-            epsilon=0.0, seed=ep_seed, verbose=False, vec_env=True
+            epsilon=0.0, seed=ep_seed, verbose=False, vec_env=vec_env
         )
         
         #------------------------------------------------------------
