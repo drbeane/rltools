@@ -94,7 +94,7 @@ class REINFORCE():
             
         return history
 
-    def train(self, episodes, lr, lr_decay=1.0, baseline_lr=None,
+    def train(self, episodes, alpha, alpha_decay=1.0, baseline_alpha=None,
               max_steps=None, ms_delta=0, stop_cond=None, updates=None, seed=None,):
 
         if seed is not None:
@@ -105,8 +105,8 @@ class REINFORCE():
         #--------------------------------------------
         # Create Adam optimizer
         #--------------------------------------------
-        optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=lr)
-        policy_scheduler = ExponentialLR(optimizer, gamma=lr_decay)
+        optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=alpha)
+        policy_scheduler = ExponentialLR(optimizer, gamma=alpha_decay)
 
         baseline = 0.0
         stop = False
@@ -133,8 +133,8 @@ class REINFORCE():
             # Calculate Loss
             #--------------------------------------------
             ret_tensor = torch.FloatTensor(returns)
-            if baseline_lr is not None:
-                baseline += baseline_lr * (ret_tensor.mean() - baseline)
+            if baseline_alpha is not None:
+                baseline += baseline_alpha * (ret_tensor.mean() - baseline)
                 ret_tensor -= baseline
 
             #print(self.log_probs)
