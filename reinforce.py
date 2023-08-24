@@ -95,8 +95,11 @@ class REINFORCE():
         return history
 
     def train(self, episodes, alpha, alpha_decay=1.0, baseline_alpha=None,
-              max_steps=None, ms_delta=0, stop_cond=None, updates=None, seed=None,):
-
+              max_steps=None, ms_delta=0, stop_cond=None, updates=None, seed=None,
+              eval_eps=100):
+        
+        from rltools.utils import evaluate
+        
         if seed is not None:
             np.random.seed(seed)
             env_seeds = np.random.choice(episodes*10, episodes, replace=False)
@@ -111,14 +114,14 @@ class REINFORCE():
         baseline = 0.0
         stop = False
         show_update = False
-        for i in range(episodes):
+        for n in range(episodes):
             self.ep_count += 1
             t0 = time.time()
 
             #--------------------------------------------
             # Create episode and calculate returns
             #--------------------------------------------
-            history = self.generate_episode(max_steps=max_steps,  seed=env_seeds[i])
+            history = self.generate_episode(max_steps=max_steps,  seed=env_seeds[n])
 
             T = len(self.rewards)
             returns = np.zeros(T)
@@ -178,11 +181,33 @@ class REINFORCE():
                 out = f'Episode {self.ep_count:<{eplen}} -- Elapsed_Time: {dt:>5.2f}s,  '
                 out += f'Loss:{loss.item():>12.4f},  Return: {ret_1:>7.2f},  '
                 out += f'Mean_Return_10: {ret_10:>7.2f},  Mean_Return_100: {ret_100:>7.2f}'
-                print(out)
+                #print(out)
                 show_update = False
                 
-                positions = [s[0] for s in history['states']]
-                print(np.max(positions).round(2), np.max(self.rewards).round(2))
+                #positions = [s[0] for s in history['states']]
+                #print(np.max(positions).round(2), np.max(self.rewards).round(2))
+
+            #------------------------------------------------------------
+            # Report Results
+            #------------------------------------------------------------
+            if updates is not None and n == 0:
+                col_names = 'Episode   Mean[Return]  SD[Return]  Mean[Length]  SD[Length]'
+                #if check_success: col_names += '  Success_Rate'
+                print(col_names, '\n', '-' * len(col_names), sep='')
+        
+            
+            if updates is not None and (n+1) % updates == 0:
+                eval_seed = np.random.choice(10**6)
+                stats = evaluate(self.env, self, self.gamma, episodes=eval_eps,
+                                 max_steps=max_steps, seed=eval_seed)
+                out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
+                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
+                #if check_success:
+                #    out += f'{stats["sr"]:>14.4f}'
+                
+                #if verbose: print(out)
+                print(out)
+
 
             #--------------------------------------------
             # Prepare for next episode
