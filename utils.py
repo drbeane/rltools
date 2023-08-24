@@ -29,7 +29,7 @@ class SB3Agent:
         if self.seed is not None:
             from stable_baselines3.common.utils import set_random_seed
             set_random_seed(self.seed)
-        return self.model.predict(state)[0]
+        return self.model.predict(state, deterministic=True)[0]
 
 class RandomAgent:
     def __init__(self, env):
