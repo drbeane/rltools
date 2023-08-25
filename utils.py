@@ -514,13 +514,13 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
          })
 
     if show_report:
-        print(f'Mean Return:   {stats["mean_return"]:.4f}')
-        print(f'StdDev Return: {stats["stdev_return"]:.4f}')
-        print(f'Mean Length:   {stats["mean_length"]:.4f}')
-        print(f'StdDev Length: {stats["stdev_length"]:.4f}')
+        print(f'Mean Return:    {round(stats["mean_return"], 4)}')
+        print(f'StdDev Return:  {round(stats["stdev_return"], 4)}')
+        print(f'Mean Length:    {round(stats["mean_length"], 4)}')
+        print(f'StdDev Length:  {round(stats["stdev_length"], 4)}')
         
         if check_success:
-            print(f'Success Rate:  {stats["sr"]:.4f}')
+            print(f'Success Rate:   {round(stats["sr"], 4)}')
 
     return stats
     
