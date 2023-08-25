@@ -263,7 +263,7 @@ class TaxiMod(ogym.Wrapper):
     
     def __init__(self, env):
         super().__init__(env)
-        self.status = None
+        self.status = 'ongoing'
     
     def get_states(self):
         return range(self.observation_space.n)
@@ -277,7 +277,11 @@ class TaxiMod(ogym.Wrapper):
             
         
         return state, reward, terminated, truncated, info
-        
+    
+    def reset(self, seed=None):
+        state, info = super().reset(seed=seed)
+        self.status = 'ongoing'
+        return state, info
 
 if __name__ == '__main__':
     
