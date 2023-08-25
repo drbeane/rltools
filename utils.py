@@ -379,7 +379,7 @@ def generate_episode(
         wa = max([len(str(a)) for a in a_list]) + 2
         wa = max(wa, 8)
         ws = max([len(s) for s in ss_list]) + 2
-        ws = max(ws, 7)
+        ws = max(ws, 11)
         wr = 8
         wt = 12
         wi = max([len(i) for i in i_list])
@@ -398,7 +398,7 @@ def generate_episode(
             zip(a_list, ss_list, r_list, d_list, i_list)):
      
             print(f'{n:<{wn}}{a:<{wa}}{s:<{ws}}' + 
-                  f'{r:<{wr}}{t:<{wt}}{i:<{wi}}')
+                  f'{r:<{wr}}{d:<{wt}}{i:<{wi}}')
         print('-'*w)
         print(t + 1, 'steps completed.')
         
@@ -448,7 +448,7 @@ def decode_state(env, state):
     
 
 def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, 
-             check_success=False, vec_env=False):
+             check_success=False, show_report=True, vec_env=False):
     import numpy as np
     
     np_state = set_seed(seed)
@@ -513,43 +513,28 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
             'avg_len_f' : None if num_failure == 0 else len_failure / num_failure
          })
 
+    if show_report:
+        print(f'Mean Return:   {stats["mean_return"]:.4f}')
+        print(f'StdDev Return: {stats["stdev_return"]:.4f}')
+        print(f'Mean Length:   {stats["mean_length"]:.4f}')
+        print(f'StdDev Length: {stats["stdev_length"]:.4f}')
+        
+        if check_success:
+            print(f'Success Rate:  {stats["sr"]:.4f}')
+
     return stats
     
     unset_seed(np_state)
 
-def DEPRECATED_success_rate(env, agent, episodes, max_steps=1000, seed=None, vec_env=False):
-    import numpy as np
-    
-    num_success = 0
-    num_failure = 0
-    len_success = 0
-    len_failure = 0
-    
-    if seed is not None:
-        np.random.seed(seed)
-        seeds = np.random.choice(10*episodes, episodes)
-    
-    for i in range(episodes):
-        sd = None if seed is None else int(seeds[i])
-        history = generate_episode(
-            env=env, agent=agent, max_steps=max_steps, 
-            seed=sd, verbose=False, vec_env=vec_env
-        )
-        #print(env.status)
-        if env.status == 'success':
-            num_success += 1
-            len_success += len(history['actions'])
-        else:
-            num_failure += 1
-            len_failure += len(history['actions'])
-    
-    sr = num_success / episodes
-    info = {
-        'sr' : sr,
-        'avg_len' : (len_success + len_failure) / episodes,
-        'avg_len_s' : None if num_success == 0 else len_success / num_success,
-        'avg_len_f' : None if num_failure == 0 else len_failure / num_failure
-        
-    }
 
-    return sr, info
+if __name__ == '__main__':
+    import os
+    import sys
+    sys.path.append(os.getcwd())
+
+    import rltools.gym as gym
+    env = gym.make('FrozenLake-v1', render_mode='rgb_array')
+    random_agent = RandomAgent(env)
+    history = generate_episode(env=env, agent=random_agent, max_steps=100, seed=42, verbose=True)
+    
+    eval_results = evaluate(env, random_agent, gamma=1.0, episodes=10, check_success=True, max_steps=100, seed=1)
