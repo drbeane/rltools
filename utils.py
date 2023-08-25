@@ -400,7 +400,7 @@ def generate_episode(
             print(f'{n:<{wn}}{a:<{wa}}{s:<{ws}}' + 
                   f'{r:<{wr}}{d:<{wt}}{i:<{wi}}')
         print('-'*w)
-        print(t + 1, 'steps completed.')
+        print(t, 'steps completed.')
         
     #--------------------------------------------------------
     # Create history dictionary 
