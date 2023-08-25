@@ -19,7 +19,32 @@ class REINFORCE():
         self.log_probs = []
         self.rewards = []
 
-    def select_action(self, state, return_log_prob=False):
+    def select_action(self, state):
+
+        #-------------------------------------------
+        # Convert state to Tensor (from np.array)
+        #-------------------------------------------
+        if not isinstance(state, torch.Tensor):
+            state = torch.tensor(state, dtype=torch.float32)
+
+        # Send state to device (CPU/GPU)
+        #state = state.to(device)
+
+        #-------------------------------------------
+        # Use policy network to select action
+        #-------------------------------------------
+        
+        with torch.no_grad():
+            dist_params = self.policy_net(state)
+            dist_params = dist_params.detach().numpy()
+            
+    
+        action = np.argmax(dist_params)
+        
+        return action
+
+
+    def sample_action(self, state, return_log_prob=False):
 
         #-------------------------------------------
         # Convert state to Tensor (from np.array)
@@ -73,7 +98,7 @@ class REINFORCE():
             #--------------------------------------------
             # Select and apply action
             #--------------------------------------------
-            action, log_prob = self.select_action(state, return_log_prob=True)
+            action, log_prob = self.sample_action(state, return_log_prob=True)
             if self.vec_env == False:
                 state, reward, terminated, truncated, info = self.env.step(action)
             else:
