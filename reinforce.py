@@ -121,8 +121,9 @@ class REINFORCE():
 
     def train(self, episodes, alpha, alpha_decay=1.0, baseline_alpha=None,
               max_steps=None, ms_delta=0, stop_cond=None, updates=None, seed=None,
-              eval_eps=100):
+              eval_eps=100, save_path='saved_model/'):
         
+        import os
         from rltools.utils import evaluate
         
         if seed is not None:
@@ -135,6 +136,13 @@ class REINFORCE():
         #--------------------------------------------
         optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=alpha)
         policy_scheduler = ExponentialLR(optimizer, gamma=alpha_decay)
+
+
+        #------------------------------------------------------------
+        # Create objects for storing best results
+        #------------------------------------------------------------
+        best_score = 0
+        os.makedirs(save_path, exist_ok=True)
 
         baseline = 0.0
         stop = False
@@ -216,22 +224,45 @@ class REINFORCE():
             # Report Results
             #------------------------------------------------------------
             if updates is not None and n == 0:
-                col_names = 'Episode   Mean[Return]  SD[Return]  Mean[Length]  SD[Length]'
+                col_names = 'Episode   Mean[Return]  SD[Return]  Mean[Length]  '
+                col_names += 'SD[Length]  Elapsed_Time'
                 #if check_success: col_names += '  Success_Rate'
                 print(col_names, '\n', '-' * len(col_names), sep='')
         
             
             if updates is not None and (n+1) % updates == 0:
+                #------------------------------------------------------------
+                # Evaluate Model
+                #------------------------------------------------------------
                 eval_seed = np.random.choice(10**6)
-                stats = evaluate(self.env, self, self.gamma, episodes=eval_eps,
-                                 max_steps=max_steps, seed=eval_seed)
+                stats = evaluate(
+                    self.env, self, self.gamma, episodes=eval_eps,
+                    max_steps=max_steps, seed=eval_seed, show_report=False
+                )
+                
+                #------------------------------------------------------------
+                # Check for new best model
+                #------------------------------------------------------------
+                score = stats['mean_return'] - stats['stdev_return']
+                save_msg = ''
+                if score > best_score:
+                    best_score = score
+                    torch.save(self.policy_net.state_dict(), save_path + 'best_model.pt')
+                    save_msg = '(Saving new best model)'
+                    
+
+                
                 out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
                 out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
+                out += f'{dt:>14.4f}  {save_msg}'
                 #if check_success:
                 #    out += f'{stats["sr"]:>14.4f}'
                 
                 #if verbose: print(out)
                 print(out)
+
+
+
 
 
             #--------------------------------------------
@@ -243,4 +274,5 @@ class REINFORCE():
                 break
             # End episode    
 
-            
+        
+        self.policy_net.load_state_dict(torch.load(save_path + 'best_model.pt'))
