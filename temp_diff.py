@@ -54,7 +54,7 @@ class TDAgent:
         #------------------------------------------------------------
         # Create objects for storing best results
         #------------------------------------------------------------
-        best_score = 0
+        best_score = -float('inf')
         best_pi = self.policy.copy()
         best_Q = self.Q.copy()
 
@@ -149,25 +149,38 @@ class TDAgent:
         
             
             if updates is not None and (n+1) % updates == 0:
+                #------------------------------------------------------------
+                # Evaluate Model
+                #------------------------------------------------------------
                 eval_seed = np.random.choice(10**6)
-                stats = evaluate(self.env, self, self.gamma, episodes=eval_eps,
-                                 max_steps=max_steps, seed=eval_seed, 
-                                 check_success=check_success)
-                out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
-                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
-                if check_success:
-                    out += f'{stats["sr"]:>14.4f}'
+                stats = evaluate(
+                    self.env, self, self.gamma, episodes=eval_eps,
+                    max_steps=max_steps, seed=eval_seed, 
+                    check_success=check_success, show_report=False
+                )
                 
-                if verbose: print(out)
-            
                 #------------------------------------------------------------
                 # Check for new best model
                 #------------------------------------------------------------
+                save_msg = ''
                 score = stats['mean_return'] - stats['stdev_return']
                 if score > best_score:
                     best_score = score
                     best_pi = self.policy.copy()
                     best_Q = self.Q.copy()
+                    save_msg = '(Saving new best model)'
+                
+                #------------------------------------------------------------
+                # Construct output
+                #------------------------------------------------------------
+                out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
+                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}  {save_msg}'
+                if check_success:
+                    out += f'{stats["sr"]:>14.4f}'
+                
+                if verbose: print(out)
+            
+                
 
         #------------------------------------------------------------
         # Unset the seed

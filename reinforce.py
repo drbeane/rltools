@@ -141,12 +141,11 @@ class REINFORCE():
         #------------------------------------------------------------
         # Create objects for storing best results
         #------------------------------------------------------------
-        best_score = 0
+        best_score = -float('inf')
         os.makedirs(save_path, exist_ok=True)
 
         baseline = 0.0
         stop = False
-        show_update = False
         for n in range(episodes):
             self.ep_count += 1
             t0 = time.time()
@@ -199,30 +198,12 @@ class REINFORCE():
             if stop_cond is not None:
                 if np.all(np.array(self.return_history[-stop_cond[1]:]) >= stop_cond[0]):
                     stop = True
-                    show_update = True
-
-            #--------------------------------------------
-            # Output
-            #--------------------------------------------
-            dt = time.time() - t0
-            if updates is not None:
-                if (self.ep_count) % updates == 0:
-                    show_update = True
-            
-            if show_update:
-                eplen = len(str(episodes))
-                out = f'Episode {self.ep_count:<{eplen}} -- Elapsed_Time: {dt:>5.2f}s,  '
-                out += f'Loss:{loss.item():>12.4f},  Return: {ret_1:>7.2f},  '
-                out += f'Mean_Return_10: {ret_10:>7.2f},  Mean_Return_100: {ret_100:>7.2f}'
-                #print(out)
-                show_update = False
-                
-                #positions = [s[0] for s in history['states']]
-                #print(np.max(positions).round(2), np.max(self.rewards).round(2))
 
             #------------------------------------------------------------
             # Report Results
             #------------------------------------------------------------
+            dt = time.time() - t0
+
             if updates is not None and n == 0:
                 col_names = 'Episode   Mean[Return]  SD[Return]  Mean[Length]  '
                 col_names += 'SD[Length]  Elapsed_Time'
@@ -250,8 +231,9 @@ class REINFORCE():
                     torch.save(self.policy_net.state_dict(), save_path + 'best_model.pt')
                     save_msg = '(Saving new best model)'
                     
-
-                
+                #------------------------------------------------------------
+                # Construct output
+                #------------------------------------------------------------
                 out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
                 out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
                 out += f'{dt:>14.4f}  {save_msg}'

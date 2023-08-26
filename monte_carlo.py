@@ -155,7 +155,7 @@ class MCAgent:
         #------------------------------------------------------------
         # Create objects for storing best results
         #------------------------------------------------------------
-        best_score = 0
+        best_score = -float('inf')
         best_pi = self.policy.copy()
         best_Q = self.Q.copy()
         best_V = self.V.copy()
@@ -264,26 +264,39 @@ class MCAgent:
         
             
             if updates is not None and (n+1) % updates == 0:
-                stats = evaluate(self.env, self, self.gamma, episodes=eval_eps,
-                                 max_steps=max_steps, seed=episode_seed, 
-                                 check_success=check_success)
-                out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
-                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
-                if check_success:
-                    out += f'{stats["sr"]:>14.4f}'
-                if verbose:
-                    print(out)
-                np.set_printoptions(suppress=True)
+                #------------------------------------------------------------
+                # Evaluate Model
+                #------------------------------------------------------------
+                stats = evaluate(
+                    self.env, self, self.gamma, episodes=eval_eps,
+                    max_steps=max_steps, seed=episode_seed, 
+                    check_success=check_success, show_report=False
+                )
                 
                 #------------------------------------------------------------
                 # Check for new best model
                 #------------------------------------------------------------
+                save_msg = ''
                 score = stats['mean_return'] - stats['stdev_return']
                 if score > best_score:
                     best_score = score
                     best_pi = self.policy.copy()
                     best_Q = self.Q.copy()
                     best_V = self.V.copy()
+                    save_msg = '(Saving new best model)'
+                
+                #------------------------------------------------------------
+                # Construct output
+                #------------------------------------------------------------
+                out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
+                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}  {save_msg}'
+                if check_success:
+                    out += f'{stats["sr"]:>14.4f}'
+                if verbose:
+                    print(out)
+                np.set_printoptions(suppress=True)
+                
+                
  
             
             continue # skip stuff below for now    
