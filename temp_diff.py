@@ -174,10 +174,10 @@ class TDAgent:
                 # Construct output
                 #------------------------------------------------------------
                 out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
-                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}  {save_msg}'
+                out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
                 if check_success:
                     out += f'{stats["sr"]:>14.4f}'
-                
+                out += f'  {save_msg}'
                 if verbose: print(out)
             
                 
