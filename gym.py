@@ -1,7 +1,7 @@
 import gymnasium as ogym
 
 def make(
-    name, prob=None, rew_struct=None, nsb=0, size=None, 
+    name, prob=None, rew_struct=None, size=None, 
     num_bins=None, max_angle=None, sqrt_trans=False, coord_max=None,
     record_states=False,
     **kwargs):
@@ -9,7 +9,7 @@ def make(
     env = ogym.make(name, disable_env_checker=True, **kwargs)
     if name == 'FrozenLake-v1':
         if rew_struct is None: rew_struct = [0,0,1]
-        env = FrozenLakeMod(env=env, prob=prob, rew_struct=rew_struct, nsb=nsb)
+        env = FrozenLakeMod(env=env, prob=prob, rew_struct=rew_struct)
     elif name == 'CartPole-v1':
         if max_angle is None: max_angle=1.57
         env.spec.disable_env_checker = True
@@ -25,7 +25,7 @@ def make(
 
 class FrozenLakeMod(ogym.Wrapper):
 
-    def __init__(self, env, prob=None, rew_struct=[0,0,1], nsb=0):
+    def __init__(self, env, prob=None, rew_struct=[0,0,1]):
         '''
         rew_struct = [step, fail, goal]
         '''
@@ -34,7 +34,6 @@ class FrozenLakeMod(ogym.Wrapper):
         self.rew_struct = rew_struct
         self.prob = prob
         self.status = None
-        self.nsb = nsb
         self.visited = set()
         if prob is not None:
             self.set_transitions()
@@ -275,7 +274,6 @@ class TaxiMod(ogym.Wrapper):
         if terminated:
             self.status = 'success'
             
-        
         return state, reward, terminated, truncated, info
     
     def reset(self, seed=None):
