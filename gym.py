@@ -52,7 +52,7 @@ class FrozenLakeMod(ogym.Wrapper):
         state, reward, terminated, truncated, info = self.env.step(action)
         
         if state not in self.visited:
-            reward += self.nsb
+            #reward += self.nsb
             self.visited.add(state)
         
         if terminated:
