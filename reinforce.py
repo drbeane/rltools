@@ -6,14 +6,18 @@ from torch.optim.lr_scheduler import ExponentialLR
 class REINFORCE():
 
     def __init__(self, env, policy_net, gamma, dist='cat', vec_env=False):
+        
         self.env = env
-        self.policy_net = policy_net
         self.gamma = gamma
         self.reset_history()
         self.ep_count = 0
         self.return_history = []
         self.dist = dist
         self.vec_env = vec_env
+        
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.policy_net = policy_net.to(self.device)
+    
 
     def reset_history(self):
         self.log_probs = []
@@ -28,7 +32,7 @@ class REINFORCE():
             state = torch.tensor(state, dtype=torch.float32)
 
         # Send state to device (CPU/GPU)
-        #state = state.to(device)
+        state = state.to(self.device)
 
         #-------------------------------------------
         # Use policy network to select action
@@ -53,7 +57,7 @@ class REINFORCE():
             state = torch.tensor(state, dtype=torch.float32)
 
         # Send state to device (CPU/GPU)
-        #state = state.to(device)
+        state = state.to(self.device)
 
         #-------------------------------------------
         # Use policy network to select action
@@ -146,9 +150,10 @@ class REINFORCE():
 
         baseline = 0.0
         stop = False
+        t0 = time.time()
         for n in range(episodes):
             self.ep_count += 1
-            t0 = time.time()
+            
 
             #--------------------------------------------
             # Create episode and calculate returns
@@ -202,8 +207,7 @@ class REINFORCE():
             #------------------------------------------------------------
             # Report Results
             #------------------------------------------------------------
-            dt = time.time() - t0
-
+            
             if updates is not None and n == 0:
                 col_names = 'Episode   Mean[Return]  SD[Return]  Mean[Length]  '
                 col_names += 'SD[Length]  Elapsed_Time'
@@ -212,6 +216,8 @@ class REINFORCE():
         
             
             if updates is not None and (n+1) % updates == 0:
+                dt = time.time() - t0  # Get elapsed time for batch of episodes
+                                
                 #------------------------------------------------------------
                 # Evaluate Model
                 #------------------------------------------------------------
@@ -242,7 +248,7 @@ class REINFORCE():
                 
                 #if verbose: print(out)
                 print(out)
-
+                t0 = time.time()
 
 
 
