@@ -40,7 +40,8 @@ class REINFORCE():
         
         with torch.no_grad():
             dist_params = self.policy_net(state)
-            dist_params = dist_params.detach().numpy()
+            #dist_params = dist_params.detach().numpy()
+            dist_params = dist_params.cpu().numpy()
             
     
         action = np.argmax(dist_params)
@@ -236,6 +237,13 @@ class REINFORCE():
                     best_score = score
                     torch.save(self.policy_net.state_dict(), save_path + 'best_model.pt')
                     save_msg = '(Saving new best model)'
+                
+                #------------------------------------------------------------
+                # Checkpoint
+                #------------------------------------------------------------
+                if checkpoint:
+                    torch.save(self.policy_net.state_dict(), save_path + f'checkpoint_{n+1:07}.pt')
+                
                     
                 #------------------------------------------------------------
                 # Construct output
