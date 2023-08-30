@@ -125,7 +125,7 @@ class REINFORCE():
 
     def train(self, episodes, alpha, alpha_decay=1.0, baseline_alpha=None,
               max_steps=None, ms_delta=0, stop_cond=None, updates=None, seed=None,
-              eval_eps=100, save_path='saved_model/'):
+              eval_eps=100, save_path='saved_models/', checkpoint=False):
         
         import os
         from rltools.utils import evaluate
@@ -178,7 +178,7 @@ class REINFORCE():
                 ret_tensor -= baseline
 
             #print(self.log_probs)
-            #ret_tensor = ret_tensor.to(device)
+            ret_tensor = ret_tensor.to(self.device)
             log_probs = torch.cat(self.log_probs)
             loss = - torch.sum(log_probs * ret_tensor.detach())
 
