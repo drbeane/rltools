@@ -217,7 +217,6 @@ class REINFORCE():
         
             
             if updates is not None and (n+1) % updates == 0:
-                dt = time.time() - t0  # Get elapsed time for batch of episodes
                                 
                 #------------------------------------------------------------
                 # Evaluate Model
@@ -248,6 +247,9 @@ class REINFORCE():
                 #------------------------------------------------------------
                 # Construct output
                 #------------------------------------------------------------
+                dt = time.time() - t0  # Get elapsed time for batch of episodes
+                t0 = time.time()
+                
                 out  = f'{n+1:<9}{stats["mean_return"]:>13.4f}{stats["stdev_return"]:>12.4f}'
                 out += f'{stats["mean_length"]:>14.4f}{stats["stdev_length"]:>12.4f}'
                 out += f'{dt:>14.4f}  {save_msg}'
@@ -256,7 +258,7 @@ class REINFORCE():
                 
                 #if verbose: print(out)
                 print(out)
-                t0 = time.time()
+                
 
 
 
