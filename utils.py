@@ -300,8 +300,8 @@ def generate_episode(
         state = env.reset()
     #else:
     
-    #if seed is None:
-    #    state, info = env.reset()
+    if seed is None:
+        state, info = env.reset()
     else:
         state, info = env.reset(seed=int(seed))
         env.action_space.seed(int(seed))
