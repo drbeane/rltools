@@ -525,9 +525,11 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
         if check_success:
             print(f'Success Rate:   {round(stats["sr"], 4)}')
 
+    unset_seed(np_state)
+
     return stats
     
-    unset_seed(np_state)
+    
 
 
 if __name__ == '__main__':
