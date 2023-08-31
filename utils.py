@@ -22,14 +22,16 @@ def render_mp4(videopath):
 
 
 class SB3Agent:
-    def __init__(self, model, seed=None): 
+    def __init__(self, model, seed=None, deterministic=True): 
         self.model = model
         self.seed = seed
+        self.deterministic = deterministic
     def select_action(self, state):
         if self.seed is not None:
             from stable_baselines3.common.utils import set_random_seed
             set_random_seed(self.seed)
-        return self.model.predict(state, deterministic=True)[0]
+        a = self.model.predict(state, deterministic=self.deterministic)[0]
+        return a
 
 class RandomAgent:
     def __init__(self, env):
