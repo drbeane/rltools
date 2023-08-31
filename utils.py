@@ -465,7 +465,6 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
     
     for n in range(episodes):
         ep_seed = np.random.choice(10**6)
-        print(np_state, ep_seed)
         history = generate_episode(
             env=env, agent=agent, max_steps=max_steps, 
             epsilon=0.0, seed=ep_seed, verbose=False, vec_env=vec_env
