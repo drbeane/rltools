@@ -527,7 +527,44 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
     unset_seed(np_state)
 
     return stats
+
+
+def sb3_training_curves(eval_env, start=1, fs=[10,2]):
+    import matplotlib.pyplot as plt
+    import numpy as np
     
+    def moving_average(a, n=100):
+        padded = np.concatenate([np.zeros(n-1), a])
+        conv = np.convolve(padded, np.ones(n), 'valid')
+        conv[:n] = conv[:n] / np.arange(1,n+1)
+        conv[n:] = conv[n:] / n
+        return conv
+
+    rewards = eval_env.get_episode_rewards()
+    #timesteps = eval_env.get_total_steps()
+    lengths = eval_env.get_episode_lengths()
+    num_episodes = len(rewards)
+    episodes = range(1, num_episodes+1)
+    ma_rewards = moving_average(rewards)
+    ma_lengths = moving_average(lengths)
+
+    plt.figure(figsize=fs)
+    plt.scatter(episodes[start-1:], rewards[start-1:], s=1, alpha=0.9, zorder=2, c='darkgray')
+    plt.plot(episodes[start-1:], ma_rewards[start-1:], zorder=3)
+    plt.xlabel('Episode')
+    plt.ylabel('Return')
+    plt.title('Returns for Evaluation Environment During Training')
+    plt.grid()
+    plt.show()
+
+    plt.figure(figsize=fs)
+    plt.scatter(episodes[start-1:], lengths[start-1:], s=1, alpha=0.6, zorder=2, c='darkgray')
+    plt.plot(episodes[start-1:], ma_lengths[start-1:], zorder=3)
+    plt.xlabel('Episode')
+    plt.ylabel('Episode Length')
+    plt.title('Episode Lengths for Evaluation Environment During Training')
+    plt.grid()
+    plt.show()
     
 
 
