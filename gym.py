@@ -20,7 +20,7 @@ def make(
     elif name == 'Taxi-v3':
         env = TaxiMod(env=env)
     elif name == 'CliffWalking-v0':
-        env = TaxiMod(env=env)
+        env = CliffWalkMod(env=env)
     return env
 
        
