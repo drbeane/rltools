@@ -529,7 +529,7 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
     return stats
 
 
-def sb3_training_curves(eval_env, start=1, fs=[10,2]):
+def sb3_training_curves(eval_env, start=1, fs=[10,2], n=100):
     import matplotlib.pyplot as plt
     import numpy as np
     
