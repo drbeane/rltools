@@ -145,7 +145,7 @@ def create_gif(
     # Determine FPS if not provided
     #-----------------------------------------------------------------------
     if fps is None:
-        fps_lu = {'Taxi-v3':2, 'FrozenLake-v1':4, 'CartPole-v1':40}
+        fps_lu = {'Taxi-v3':2, 'CliffWalking-v0':2, 'FrozenLake-v1':4, 'CartPole-v1':40}
         fps = fps_lu.get(env.spec.id, 20)
 
             

@@ -243,6 +243,12 @@ class CliffWalkMod(ogym.Wrapper):
     def __init__(self, env):
         super().__init__(env)
         self.status = None
+        for s in self.P.keys():
+            for a in self.P[s].keys():
+                t0, t1, t2, t3 = self.P[s][a][0]
+                if t2 == -100:
+                    self.P[s][a][0] = (t0, t1, t2, True)
+                print(s, a, self.P[s][a])
 
     def get_states(self):
         return range(self.observation_space.n)
