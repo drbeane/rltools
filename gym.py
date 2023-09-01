@@ -242,9 +242,24 @@ class CliffWalkMod(ogym.Wrapper):
     
     def __init__(self, env):
         super().__init__(env)
+        self.status = None
 
     def get_states(self):
         return range(self.observation_space.n)
+    
+    def step(self, action):
+        state, reward, terminated, truncated, info = self.env.step(action)
+        
+        if reward == -100:
+            terminated = True
+        
+        if terminated:
+            if reward == -1:
+                self.status = 'success'
+            else:
+                self.status = 'failed'
+        
+        return state, reward, terminated, truncated, info    
 
 class BlackjackMod(ogym.Wrapper):
     
