@@ -19,6 +19,8 @@ def make(
         env = BlackjackMod(env=env)
     elif name == 'Taxi-v3':
         env = TaxiMod(env=env)
+    elif name == 'CliffWalking-v0':
+        env = TaxiMod(env=env)
     return env
 
        
@@ -235,6 +237,14 @@ class CartPoleMod(ogym.Wrapper):
             state = self.digitize_state(state)
             
         return state, reward, terminated, truncated, info
+
+class CliffWalkMod(ogym.Wrapper):
+    
+    def __init__(self, env):
+        super().__init__(env)
+
+    def get_states(self):
+        return range(self.observation_space.n)
 
 class BlackjackMod(ogym.Wrapper):
     
