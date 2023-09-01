@@ -257,6 +257,18 @@ class BlackjackMod(ogym.Wrapper):
                 self.status = 'failed'
         
         return state, reward, terminated, truncated, info    
+    
+    def get_states(self):
+        
+        states = []
+        
+        for a in range(4, 31):
+            for b in range(2, 12):
+                for c in range(0, 2):
+                    states.append((a, b, c))
+            
+        
+        return states
         
 class TaxiMod(ogym.Wrapper):
     
