@@ -545,8 +545,8 @@ def sb3_training_curves(eval_env, start=1, fs=[10,2], n=100):
     lengths = eval_env.get_episode_lengths()
     num_episodes = len(rewards)
     episodes = range(1, num_episodes+1)
-    ma_rewards = moving_average(rewards)
-    ma_lengths = moving_average(lengths)
+    ma_rewards = moving_average(rewards, n=n)
+    ma_lengths = moving_average(lengths, n=n)
 
     plt.figure(figsize=fs)
     plt.scatter(episodes[start-1:], rewards[start-1:], s=1, alpha=0.9, zorder=2, c='darkgray')
