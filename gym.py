@@ -248,7 +248,7 @@ class CliffWalkMod(ogym.Wrapper):
                 t0, t1, t2, t3 = self.P[s][a][0]
                 if t2 == -100:
                     self.P[s][a][0] = (t0, t1, t2, True)
-                print(s, a, self.P[s][a])
+            
 
     def get_states(self):
         return range(self.observation_space.n)
