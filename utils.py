@@ -568,7 +568,54 @@ def sb3_training_curves(eval_env, start=1, fs=[10,2], n=100):
     plt.title('Episode Lengths for Evaluation Environment During Training')
     plt.grid()
     plt.show()
+
+def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None):
+    import numpy as np
+    import matplotlib.pyplot as plt
     
+    data = np.load(path + 'evaluations.npz')
+    _ = data['timesteps']
+
+    lengths = data['ep_lengths']
+    scores = data['results']
+
+    scores_flat = scores.reshape(-1)
+    lengths_flat = lengths.reshape(-1)
+
+    mean_lengths = lengths.mean(axis=1)
+    mean_scores = scores.mean(axis=1)
+    best = mean_scores.max()
+    best_idx = mean_scores.argmax()
+
+    r, c = scores.shape
+
+    plt.figure(figsize=fs)
+    plt.scatter(
+        np.repeat(np.arange(start, r + 1), c),
+        scores_flat[start:], alpha=0.6, s=2, c='darkgray', zorder=2
+    )
+    plt.scatter(best_idx + 1, best, c='gold', alpha=0.99, zorder=3, s=80, label='Best Mean Return')
+    plt.plot(np.arange(start, r+1), mean_scores[start:], zorder=4)
+    plt.legend()
+    if ylim is not None:
+        plt.ylim(ylim)
+    plt.xlabel('Episode')
+    plt.ylabel('Return')
+    plt.title('Returns for Evaluation Environment During Training')
+    plt.grid()
+    plt.show()
+    
+    plt.figure(figsize=fs)
+    plt.scatter(
+        np.repeat(np.arange(start, r + 1), c),
+        lengths_flat[start:], alpha=0.6, s=2, c='darkgray', zorder=2
+    )
+    plt.plot(np.arange(start, r+1), mean_lengths[start:], zorder=4)
+    plt.xlabel('Episode')
+    plt.ylabel('Episode Length')
+    plt.title('Episode Lengths for Evaluation Environment During Training')
+    plt.grid()
+    plt.show()
 
 
 if __name__ == '__main__':
