@@ -588,14 +588,15 @@ def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None):
     best_idx = mean_scores.argmax()
 
     r, c = scores.shape
-
+    repeated_timesteps = np.repeat(np.arange(start, r + 1), c)
+    
     plt.figure(figsize=fs)
     plt.scatter(
-        np.repeat(np.arange(start, r + 1), c),
-        scores_flat[start:], alpha=0.6, s=2, c='darkgray', zorder=2
+        repeated_timesteps,
+        scores_flat[c*(start-1):], alpha=0.6, s=2, c='darkgray', zorder=2
     )
     plt.scatter(best_idx + 1, best, c='gold', alpha=0.99, zorder=3, s=80, label='Best Mean Return')
-    plt.plot(np.arange(start, r+1), mean_scores[start:], zorder=4)
+    plt.plot(np.arange(start, r+1), mean_scores[start-1:], zorder=4)
     plt.legend()
     if ylim is not None:
         plt.ylim(ylim)
@@ -607,10 +608,10 @@ def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None):
     
     plt.figure(figsize=fs)
     plt.scatter(
-        np.repeat(np.arange(start, r + 1), c),
-        lengths_flat[start:], alpha=0.6, s=2, c='darkgray', zorder=2
+        repeated_timesteps,
+        lengths_flat[c*(start-1):], alpha=0.6, s=2, c='darkgray', zorder=2
     )
-    plt.plot(np.arange(start, r+1), mean_lengths[start:], zorder=4)
+    plt.plot(np.arange(start, r+1), mean_lengths[start-1:], zorder=4)
     plt.xlabel('Episode')
     plt.ylabel('Episode Length')
     plt.title('Episode Lengths for Evaluation Environment During Training')
