@@ -319,6 +319,7 @@ def generate_episode(
     else:
         state, info = env.reset(seed=int(seed))
         env.action_space.seed(int(seed))
+        agent.env.action_space.seed(int(seed))
 
     #--------------------------------------------------------
     # Create Vector Environment for Atari
