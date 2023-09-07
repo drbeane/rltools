@@ -289,7 +289,18 @@ def create_gif_old(
 
 def generate_episode(
     env, agent,  max_steps=None, init_state=None, random_init_action=False, 
-    epsilon=0.0, seed=None, verbose=False, vec_env=False):
+    epsilon=0.0, seed=None, verbose=False, n_frames=None):
+    
+    from stable_baselines3.common.vec_env import VecFrameStack
+    from stable_baselines3.common.atari_wrappers import AtariWrapper   
+    from stable_baselines3.common.vec_env import DummyVecEnv 
+    
+    
+    # For Atari environments, env will be the BASE environment. 
+    # Vector wrapping is performed below. 
+    
+    # n_frames used only for Atari environments currently
+    # could consider using for highway environments
     
     import numpy as np
     import time
@@ -299,10 +310,10 @@ def generate_episode(
     #--------------------------------------------------------
     np_state = set_seed(seed)
     
-    if vec_env:
-        state = env.reset()
-    #else:
     
+    #--------------------------------------------------------
+    # Reset Environment
+    #--------------------------------------------------------
     if seed is None:
         state, info = env.reset()
     else:
@@ -310,7 +321,16 @@ def generate_episode(
         env.action_space.seed(int(seed))
 
     #--------------------------------------------------------
-    # Set initial state
+    # Create Vector Environment for Atari
+    #--------------------------------------------------------
+    if n_frames is not None:          
+        vec_env = AtariWrapper(env, frame_skip=0)
+        vec_env = DummyVecEnv([lambda: vec_env])
+        vec_env = VecFrameStack(vec_env, n_stack=n_frames)
+        state = vec_env.reset()
+        
+    #--------------------------------------------------------
+    # Set initial state (Used for exploring starts)
     #--------------------------------------------------------
     if init_state is not None:
         env.unwrapped.s = init_state
@@ -358,8 +378,8 @@ def generate_episode(
         #--------------------------------------------------------
         # Apply action
         #--------------------------------------------------------
-        if vec_env:
-            state, reward, done, info = env.step(action)
+        if n_frames is not None:
+            state, reward, done, info = vec_env.step([action])
             truncated = False
         else:
             state, reward, done, truncated, info = env.step(action)

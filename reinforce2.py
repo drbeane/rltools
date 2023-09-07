@@ -49,23 +49,6 @@ class REINFORCE():
         self.model = policy_net
         self.gamma = gamma
 
-    def select_action(self, state):
-        #-------------------------------------------
-        # Convert state to Tensor (from np.array)
-        #-------------------------------------------
-        if not isinstance(state, torch.Tensor):
-            state = torch.tensor(state, dtype=torch.float32)
-        state = state.to(DEVICE)
-
-        #-------------------------------------------
-        # Use policy network to select action
-        #-------------------------------------------
-        with torch.no_grad():
-            action = self.model(state)
-            #dist_params = dist_params.detach().numpy()
-            #action = np.argmax(dist_params)
-        return action
-
 
     def train(self, episodes, alpha=0.0001, max_steps=1000, updates=None,
               save_path='save/', checkpoint=False):
