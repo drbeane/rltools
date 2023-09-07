@@ -40,11 +40,12 @@ class REINFORCE():
         
         with torch.no_grad():
             dist_params = self.policy_net(state)
-            #dist_params = dist_params.detach().numpy()
             dist_params = dist_params.cpu().numpy()
-            
-    
-        action = np.argmax(dist_params)
+            if self.dist == 'cat':
+                #dist_params = dist_params.detach().numpy()
+                action = np.argmax(dist_params)
+            else: 
+                action = dist_params[0]
         
         return action
 
