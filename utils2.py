@@ -378,8 +378,10 @@ def generate_episode(
         # Apply action
         #--------------------------------------------------------
         if atari:
-            print(action)
             # SB3 models will retun the action in a list already
+            # But random agents will not. 
+            if not isinstance(action, np.ndarray) and not isinstance(action, list):
+                action = [action]
             state, reward, done, info = env.step(action)
             reward = reward[0]
             done = done[0]
