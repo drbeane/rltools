@@ -37,8 +37,11 @@ class SB3Agent:
         return a
 
 class RandomAgent:
-    def __init__(self, env):
+    def __init__(self, env, seed=None):
         self.env = env
+        self.seed = seed
+        if seed is not None:
+            self.env.action_space.seed(seed)
     def select_action(self, state):
         return self.env.action_space.sample()
 
