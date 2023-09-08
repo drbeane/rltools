@@ -252,7 +252,7 @@ def create_gif(
     # Print episode information
     #-------------------------------------------------------
     print(f'{t} steps completed.')
-    print(f'Cumulative reward: {total_reward}')
+    print(f'Cumulative reward: {total_reward:.4f}')
     try:
         print(env.status.title())
     except:
