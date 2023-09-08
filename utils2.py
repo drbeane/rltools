@@ -137,6 +137,7 @@ def create_gif(
     ):
     
     import os
+    import numpy as np
     import imageio
     from IPython.display import Image, display, HTML
     
@@ -154,7 +155,7 @@ def create_gif(
     # Determine FPS if not provided
     #-----------------------------------------------------------------------
     if atari:
-        fps = 40    
+        fps = 50    
     if fps is None:
         fps_lu = {'Taxi-v3':2, 'CliffWalking-v0':3, 'FrozenLake-v1':4, 'CartPole-v1':40}
         fps = fps_lu.get(env.spec.id, 20)
