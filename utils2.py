@@ -141,9 +141,10 @@ def create_gif(
     import imageio
     from IPython.display import Image, display, HTML
     
-    from stable_baselines3.common.vec_env import VecFrameStack
-    from stable_baselines3.common.atari_wrappers import AtariWrapper   
-    from stable_baselines3.common.vec_env import DummyVecEnv 
+    if atari:
+        from stable_baselines3.common.vec_env import VecFrameStack
+        from stable_baselines3.common.atari_wrappers import AtariWrapper   
+        from stable_baselines3.common.vec_env import DummyVecEnv 
 
     if actions is None:
         if max_steps is None: max_steps = float('inf')
