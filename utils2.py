@@ -133,7 +133,8 @@ def record_episode(
 
 def create_gif(
     env, agent, actions=None, max_steps=1000, seed=None, fps=None,
-    folder='', filename='', processor=None, display_gif=True, n_frames=None
+    folder='', filename='', processor=None, display_gif=True, n_frames=None,
+    tll=True
     ):
     
     import os
@@ -173,7 +174,7 @@ def create_gif(
     # Create Vector Environment for Atari
     #--------------------------------------------------------
     if n_frames is not None:          
-        vec_env = AtariWrapper(env, frame_skip=0)
+        vec_env = AtariWrapper(env, frame_skip=0, terminal_on_life_loss=tll)
         vec_env = DummyVecEnv([lambda: vec_env])
         vec_env = VecFrameStack(vec_env, n_stack=n_frames)
         state = vec_env.reset()
@@ -302,7 +303,7 @@ def create_gif_old(
 
 def generate_episode(
     env, agent,  max_steps=None, init_state=None, random_init_action=False, 
-    epsilon=0.0, seed=None, verbose=False, n_frames=None):
+    epsilon=0.0, seed=None, verbose=False, n_frames=None, tll=True):
     
     from stable_baselines3.common.vec_env import VecFrameStack
     from stable_baselines3.common.atari_wrappers import AtariWrapper   
@@ -336,7 +337,7 @@ def generate_episode(
     # Create Vector Environment for Atari
     #--------------------------------------------------------
     if n_frames is not None:          
-        vec_env = AtariWrapper(env, frame_skip=0)
+        vec_env = AtariWrapper(env, frame_skip=0, terminal_on_life_loss=tll)
         vec_env = DummyVecEnv([lambda: vec_env])
         vec_env = VecFrameStack(vec_env, n_stack=n_frames)
         state = vec_env.reset()
@@ -488,7 +489,7 @@ def decode_state(env, state):
     
 
 def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, 
-             check_success=False, show_report=True, vec_env=False):
+             check_success=False, show_report=True, n_frames=None, tll=True):
     import numpy as np
     
     np_state = set_seed(seed)
@@ -504,8 +505,8 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
     for n in range(episodes):
         ep_seed = np.random.choice(10**6)
         history = generate_episode(
-            env=env, agent=agent, max_steps=max_steps, 
-            epsilon=0.0, seed=ep_seed, verbose=False, vec_env=vec_env
+            env=env, agent=agent, max_steps=max_steps, epsilon=0.0, 
+            seed=ep_seed, verbose=False, n_frames=n_frames, tll=tll
         )
         
         #------------------------------------------------------------
