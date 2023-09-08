@@ -175,6 +175,7 @@ def create_gif(
     frames.append(processor(env.render()) )
 
     t = 0
+    total_reward = 0
     while t < max_steps:
         t += 1
         if actions is None:
@@ -188,6 +189,7 @@ def create_gif(
             state, reward, terminated, info = env.step(action)
         else:          
             state, reward, terminated, truncated, info = env.step(action)
+        total_reward += reward
         frames.append(processor(env.render()))
         if terminated:
             break
@@ -196,6 +198,7 @@ def create_gif(
         frames.append(processor(env.render()))
 
     print(f'{t} steps completed.')
+    print(f'Cumulative reward: {total_reward}')
     try:
         print(env.status.title())
     except:
