@@ -212,12 +212,9 @@ def create_gif(
         if atari:
             if t == 1:              
                 lives = new_lives   # Both start as None
-            
             if lives != new_lives:
-                action = 1
-                
+                action = 1                
             lives = new_lives
-        
         
         #--------------------------------------------------------
         # Apply action
@@ -398,6 +395,8 @@ def generate_episode(
     # Loop for max steps episodes
     #--------------------------------------------------------
     t = 0
+    lives = None            # Used to track when life lost for Atari
+    new_lives = None        # Used to track when life lost for Atari
     if max_steps is None:
         max_steps = float('inf')
     while t < max_steps:
@@ -423,6 +422,18 @@ def generate_episode(
             action = env.action_space.sample()
         else:
             action = agent.select_action(state)
+        
+        #--------------------------------------------------------
+        # Check to see if reset is needed for Atari Environment
+        # Required when a life is lost
+        #--------------------------------------------------------
+        if atari:
+            if t == 1:              
+                lives = new_lives   # Both start as None
+            if lives != new_lives:
+                action = 1                
+            lives = new_lives
+        
         
         #--------------------------------------------------------
         # Apply action
