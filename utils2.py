@@ -132,14 +132,17 @@ def record_episode(
 
 
 def create_gif(
-    env, agent, actions=None, max_steps=1000, seed=None, fps=None, vec_env=False,
-    folder='', filename='', processor=None, display_gif=True
+    env, agent, actions=None, max_steps=1000, seed=None, fps=None,
+    folder='', filename='', processor=None, display_gif=True, n_frames=None
     ):
     
     import os
-    import torch
     import imageio
     from IPython.display import Image, display, HTML
+    
+    from stable_baselines3.common.vec_env import VecFrameStack
+    from stable_baselines3.common.atari_wrappers import AtariWrapper   
+    from stable_baselines3.common.vec_env import DummyVecEnv 
 
     if actions is None:
         if max_steps is None: max_steps = float('inf')
@@ -156,20 +159,25 @@ def create_gif(
 
             
     #-----------------------------------------------------------------------
-    # Set seeds
+    # Set Seeds
     #-----------------------------------------------------------------------    
-    if vec_env:
-        state = env.reset()
+    np_state = set_seed(seed)
+    
+    if seed is None:
+        state, info = env.reset()
     else:
-        np_state = set_seed(seed)
         state, info = env.reset(seed=seed)
         env.action_space.seed(seed)
-    #else:
-    #    state, info = env.reset()
-        
-    #if seed is not None:
-    #    torch.manual_seed(seed)
 
+    #--------------------------------------------------------
+    # Create Vector Environment for Atari
+    #--------------------------------------------------------
+    if n_frames is not None:          
+        vec_env = AtariWrapper(env, frame_skip=0)
+        vec_env = DummyVecEnv([lambda: vec_env])
+        vec_env = VecFrameStack(vec_env, n_stack=n_frames)
+        state = vec_env.reset()
+        
 
     frames = []
     frames.append(processor(env.render()) )
@@ -185,8 +193,8 @@ def create_gif(
         
         
         #action = [action] if vec_env else action
-        if vec_env:
-            state, reward, terminated, info = env.step(action)
+        if n_frames is not None:
+            state, reward, terminated, info = env.step([action])
         else:          
             state, reward, terminated, truncated, info = env.step(action)
         total_reward += reward
@@ -213,8 +221,7 @@ def create_gif(
     #------------------------------------------------------------
     # Unset the seed
     #------------------------------------------------------------
-    if vec_env == False:
-        unset_seed(np_state)
+    unset_seed(np_state)
 
 
 def create_gif_old(
@@ -373,7 +380,7 @@ def generate_episode(
                 random_action = True
         
         #--------------------------------------------------------
-        # Select action.
+        # Select action
         #--------------------------------------------------------
         if random_action:
             action = env.action_space.sample()
@@ -442,6 +449,9 @@ def generate_episode(
         'rewards' : r_list 
     } 
     
+    #------------------------------------------------------------
+    # Unset the seed
+    #------------------------------------------------------------
     unset_seed(np_state)
        
     return history
