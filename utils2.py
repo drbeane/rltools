@@ -448,6 +448,7 @@ def generate_episode(
             reward = reward[0]
             done = done[0]
             truncated = False
+            new_lives = info[0]['lives']
         else:
             state, reward, done, truncated, info = env.step(action)
         
