@@ -194,7 +194,7 @@ def create_gif(
         
         #action = [action] if vec_env else action
         if n_frames is not None:
-            state, reward, terminated, info = env.step([action])
+            state, reward, terminated, info = vec_env.step([action])
         else:          
             state, reward, terminated, truncated, info = env.step(action)
         total_reward += reward
