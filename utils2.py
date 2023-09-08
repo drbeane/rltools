@@ -212,6 +212,8 @@ def create_gif(
             # But random agents will not. 
             if not isinstance(action, np.ndarray) and not isinstance(action, list):
                 action = [action]
+            # TEMP: replace noop with fire
+            if action[0] == 0: action = [1]
             state, reward, done, info = env.step(action)
             reward = reward[0]
             done = done[0]
