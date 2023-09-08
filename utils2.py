@@ -431,6 +431,7 @@ def generate_episode(
             if t == 1:              
                 lives = new_lives   # Both start as None
             if lives != new_lives:
+                print('Firing', t)
                 action = 1                
             lives = new_lives
         
