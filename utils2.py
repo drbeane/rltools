@@ -543,7 +543,7 @@ def decode_state(env, state):
     
 
 def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, 
-             check_success=False, show_report=True, atari=True):
+             check_success=False, show_report=True, atari=False):
     import numpy as np
     
     np_state = set_seed(seed)
