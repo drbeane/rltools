@@ -543,7 +543,7 @@ def decode_state(env, state):
     
 
 def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, 
-             check_success=False, show_report=True, n_frames=None, tll=True):
+             check_success=False, show_report=True, atari=True):
     import numpy as np
     
     np_state = set_seed(seed)
@@ -560,7 +560,7 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
         ep_seed = np.random.choice(10**6)
         history = generate_episode(
             env=env, agent=agent, max_steps=max_steps, epsilon=0.0, 
-            seed=ep_seed, verbose=False, n_frames=n_frames, tll=tll
+            seed=ep_seed, verbose=False, atari=atari
         )
         
         #------------------------------------------------------------
