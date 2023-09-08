@@ -428,10 +428,10 @@ def generate_episode(
         # Required when a life is lost
         #--------------------------------------------------------
         if atari:
-            if t == 1:              
+            if t == 2:              
                 lives = new_lives   # Both start as None
             if lives != new_lives:
-                print('Firing', t)
+                print('fire!', t)
                 action = 1                
             lives = new_lives
         
