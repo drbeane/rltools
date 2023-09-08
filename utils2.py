@@ -378,6 +378,7 @@ def generate_episode(
         # Apply action
         #--------------------------------------------------------
         if atari:
+            print(action)
             # SB3 models will retun the action in a list already
             state, reward, done, info = env.step(action)
             reward = reward[0]
