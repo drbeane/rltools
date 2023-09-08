@@ -192,6 +192,8 @@ def create_gif(
     #--------------------------------------------------------
     t = 0
     total_reward = 0
+    lives = None            # Used to track when life lost for Atari
+    new_lives = None        # Used to track when life lost for Atari
     while t < max_steps:
         t += 1
         
@@ -203,6 +205,19 @@ def create_gif(
         else: 
             action = actions[t-1]
         
+        #--------------------------------------------------------
+        # Check to see if reset is needed for Atari Environment
+        # Required when a life is lost
+        #--------------------------------------------------------
+        if atari:
+            if t == 1:              
+                lives = new_lives   # Both start as None
+            
+            if lives != new_lives:
+                action = 1
+                
+            lives = new_lives
+        
         
         #--------------------------------------------------------
         # Apply action
@@ -212,15 +227,15 @@ def create_gif(
             # But random agents will not. 
             if not isinstance(action, np.ndarray) and not isinstance(action, list):
                 action = [action]
-            # TEMP: replace noop with fire
-            if action[0] == 0: action = [1]
             state, reward, done, info = env.step(action)
             reward = reward[0]
             done = done[0]
+            new_lives = info[0]['lives']
         else:          
             state, reward, done, truncated, info = env.step(action)
         
         total_reward += reward
+        
         
         #--------------------------------------------------------
         # Add new frame
