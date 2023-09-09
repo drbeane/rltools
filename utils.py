@@ -37,8 +37,11 @@ class SB3Agent:
         return a
 
 class RandomAgent:
-    def __init__(self, env):
+    def __init__(self, env, seed=None):
         self.env = env
+        self.seed = seed
+        if seed is not None:
+            self.env.action_space.seed(seed)
     def select_action(self, state):
         return self.env.action_space.sample()
 
@@ -129,14 +132,19 @@ def record_episode(
 
 
 def create_gif(
-    env, agent, actions=None, max_steps=1000, seed=None, fps=None, vec_env=False,
-    folder='', filename='', processor=None, display_gif=True
+    env, agent, actions=None, max_steps=1000, seed=None, fps=None,
+    folder='', filename='', processor=None, display_gif=True, atari=False
     ):
     
     import os
-    import torch
+    import numpy as np
     import imageio
     from IPython.display import Image, display, HTML
+    
+    if atari:
+        from stable_baselines3.common.vec_env import VecFrameStack
+        from stable_baselines3.common.atari_wrappers import AtariWrapper   
+        from stable_baselines3.common.vec_env import DummyVecEnv 
 
     if actions is None:
         if max_steps is None: max_steps = float('inf')
@@ -147,56 +155,112 @@ def create_gif(
     #-----------------------------------------------------------------------
     # Determine FPS if not provided
     #-----------------------------------------------------------------------
+    if atari:
+        fps = 50    
     if fps is None:
         fps_lu = {'Taxi-v3':2, 'CliffWalking-v0':3, 'FrozenLake-v1':4, 'CartPole-v1':40}
         fps = fps_lu.get(env.spec.id, 20)
 
             
     #-----------------------------------------------------------------------
-    # Set seeds
+    # Set Seeds
     #-----------------------------------------------------------------------    
-    if vec_env:
+    np_state = set_seed(seed)
+    
+    #--------------------------------------------------------
+    # Reset Environment
+    #--------------------------------------------------------
+    if atari:
+        # Reset the base environment, providing a seed
+        env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+        # Reset vec_env
         state = env.reset()
+        env.action_space.seed(int(seed))
+    
     else:
-        np_state = set_seed(seed)
-        state, info = env.reset(seed=seed)
-        env.action_space.seed(seed)
-    #else:
-    #    state, info = env.reset()
+        state, info = env.reset(seed=int(seed))
+        env.action_space.seed(int(seed))
         
-    #if seed is not None:
-    #    torch.manual_seed(seed)
 
-
+    #--------------------------------------------------------
+    # Create list to store frames
+    #--------------------------------------------------------
     frames = []
     frames.append(processor(env.render()) )
 
+    #--------------------------------------------------------
+    # Loop for max steps episodes
+    #--------------------------------------------------------
     t = 0
+    total_reward = 0
+    lives = None            # Used to track when life lost for Atari
+    new_lives = None        # Used to track when life lost for Atari
     while t < max_steps:
         t += 1
+        
+        #--------------------------------------------------------
+        # Select action
+        #--------------------------------------------------------
         if actions is None:
             action = agent.select_action(state)
         else: 
             action = actions[t-1]
         
+        #--------------------------------------------------------
+        # Check to see if reset is needed for Atari Environment
+        # Required when a life is lost
+        #--------------------------------------------------------
+        if atari:
+            if t == 2:              
+                lives = new_lives   # Both start as None
+            if lives != new_lives:
+                action = 1                
+            lives = new_lives
         
-        #action = [action] if vec_env else action
-        if vec_env:
-            state, reward, terminated, info = env.step(action)
+        #--------------------------------------------------------
+        # Apply action
+        #-------------------------------------------------------
+        if atari:
+            # SB3 models will retun the action in a list already
+            # But random agents will not. 
+            if not isinstance(action, np.ndarray) and not isinstance(action, list):
+                action = [action]
+            state, reward, done, info = env.step(action)
+            reward = reward[0]
+            done = done[0]
+            new_lives = info[0]['lives']
         else:          
-            state, reward, terminated, truncated, info = env.step(action)
+            state, reward, done, truncated, info = env.step(action)
+        
+        total_reward += reward
+        
+        
+        #--------------------------------------------------------
+        # Add new frame
+        #-------------------------------------------------------
         frames.append(processor(env.render()))
-        if terminated:
+        if done:
             break
 
+    #--------------------------------------------------------
+    # Add 2 seconds of static frames at end
+    #-------------------------------------------------------
     for i in range(2 * fps):
         frames.append(processor(env.render()))
 
+    #--------------------------------------------------------
+    # Print episode information
+    #-------------------------------------------------------
     print(f'{t} steps completed.')
+    print(f'Cumulative reward: {round(total_reward,4)}')
     try:
         print(env.status.title())
     except:
         pass
+    
+    #--------------------------------------------------------
+    # Create the Gif
+    #-------------------------------------------------------
     os.makedirs(folder, exist_ok=True)
     imageio.mimsave(f'{folder}/{filename}.gif', frames, format='GIF', duration=1000/fps, loop=0)   
 
@@ -207,8 +271,7 @@ def create_gif(
     #------------------------------------------------------------
     # Unset the seed
     #------------------------------------------------------------
-    if vec_env == False:
-        unset_seed(np_state)
+    unset_seed(np_state)
 
 
 def create_gif_old(
@@ -289,7 +352,7 @@ def create_gif_old(
 
 def generate_episode(
     env, agent,  max_steps=None, init_state=None, random_init_action=False, 
-    epsilon=0.0, seed=None, verbose=False, vec_env=False):
+    epsilon=0.0, seed=None, verbose=False, atari=False):
     
     import numpy as np
     import time
@@ -299,18 +362,22 @@ def generate_episode(
     #--------------------------------------------------------
     np_state = set_seed(seed)
     
-    if vec_env:
+    #--------------------------------------------------------
+    # Reset Environment
+    #--------------------------------------------------------
+    if atari:
+        # Reset the base environment, providing a seed
+        env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+        # Reset vec_env
         state = env.reset()
-    #else:
+        env.action_space.seed(int(seed))
     
-    if seed is None:
-        state, info = env.reset()
     else:
         state, info = env.reset(seed=int(seed))
         env.action_space.seed(int(seed))
-
+        
     #--------------------------------------------------------
-    # Set initial state
+    # Set initial state (Used for exploring starts)
     #--------------------------------------------------------
     if init_state is not None:
         env.unwrapped.s = init_state
@@ -329,6 +396,8 @@ def generate_episode(
     # Loop for max steps episodes
     #--------------------------------------------------------
     t = 0
+    lives = None            # Used to track when life lost for Atari
+    new_lives = None        # Used to track when life lost for Atari
     if max_steps is None:
         max_steps = float('inf')
     while t < max_steps:
@@ -348,7 +417,7 @@ def generate_episode(
                 random_action = True
         
         #--------------------------------------------------------
-        # Select action.
+        # Select action
         #--------------------------------------------------------
         if random_action:
             action = env.action_space.sample()
@@ -356,11 +425,30 @@ def generate_episode(
             action = agent.select_action(state)
         
         #--------------------------------------------------------
+        # Check to see if reset is needed for Atari Environment
+        # Required when a life is lost
+        #--------------------------------------------------------
+        if atari:
+            if t == 2:              
+                lives = new_lives   # Both start as None
+            if lives != new_lives:
+                action = 1                
+            lives = new_lives
+        
+        
+        #--------------------------------------------------------
         # Apply action
         #--------------------------------------------------------
-        if vec_env:
+        if atari:
+            # SB3 models will retun the action in a list already
+            # But random agents will not. 
+            if not isinstance(action, np.ndarray) and not isinstance(action, list):
+                action = [action]
             state, reward, done, info = env.step(action)
+            reward = reward[0]
+            done = done[0]
             truncated = False
+            new_lives = info[0]['lives']
         else:
             state, reward, done, truncated, info = env.step(action)
         
@@ -417,6 +505,9 @@ def generate_episode(
         'rewards' : r_list 
     } 
     
+    #------------------------------------------------------------
+    # Unset the seed
+    #------------------------------------------------------------
     unset_seed(np_state)
        
     return history
@@ -453,7 +544,7 @@ def decode_state(env, state):
     
 
 def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None, 
-             check_success=False, show_report=True, vec_env=False):
+             check_success=False, show_report=True, atari=False):
     import numpy as np
     
     np_state = set_seed(seed)
@@ -469,8 +560,8 @@ def evaluate(env, agent, gamma, episodes, max_steps=1000, seed=None,
     for n in range(episodes):
         ep_seed = np.random.choice(10**6)
         history = generate_episode(
-            env=env, agent=agent, max_steps=max_steps, 
-            epsilon=0.0, seed=ep_seed, verbose=False, vec_env=vec_env
+            env=env, agent=agent, max_steps=max_steps, epsilon=0.0, 
+            seed=ep_seed, verbose=False, atari=atari
         )
         
         #------------------------------------------------------------
