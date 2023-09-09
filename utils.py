@@ -174,15 +174,18 @@ def create_gif(
         # Reset the base environment, providing a seed
         if seed is not None:
             env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+            env.action_space.seed(int(seed))
         else:
             env.unwrapped.envs[0].unwrapped.reset()   
         # Reset vec_env
         state = env.reset()
-        env.action_space.seed(int(seed))
-    
+        
     else:
-        state, info = env.reset(seed=int(seed))
-        env.action_space.seed(int(seed))
+        if seed is not None:
+            state, info = env.reset(seed=int(seed))
+            env.action_space.seed(int(seed))
+        else:
+            state, info = env.reset()
         
 
     #--------------------------------------------------------
@@ -372,16 +375,19 @@ def generate_episode(
         # Reset the base environment, providing a seed
         if seed is not None:
             env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+            env.action_space.seed(int(seed))
         else:
             env.unwrapped.envs[0].unwrapped.reset()  
         # Reset vec_env
         state = env.reset()
-        env.action_space.seed(int(seed))
     
     else:
-        state, info = env.reset(seed=int(seed))
-        env.action_space.seed(int(seed))
-        
+        if seed is not None:
+            state, info = env.reset(seed=int(seed))
+            env.action_space.seed(int(seed))
+        else:
+            state, info = env.reset(seed=int(seed))
+                    
     #--------------------------------------------------------
     # Set initial state (Used for exploring starts)
     #--------------------------------------------------------
@@ -458,7 +464,6 @@ def generate_episode(
         else:
             state, reward, done, truncated, info = env.step(action)
         
-        t0 = time.time()
         a_list.append(action)
         s_list.append(state)
         r_list.append(reward)
