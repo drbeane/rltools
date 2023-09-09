@@ -260,7 +260,8 @@ class MCAgent:
             if updates is not None and n == 0:
                 col_names = 'Episode   Mean[Return]  SD[Return]  Mean[Length]  SD[Length]'
                 if check_success: col_names += '  Success_Rate'
-                print(col_names, '\n', '-' * len(col_names), sep='')
+                if verbose:
+                    print(col_names, '\n', '-' * len(col_names), sep='')
         
             
             if updates is not None and (n+1) % updates == 0:
