@@ -172,7 +172,10 @@ def create_gif(
     #--------------------------------------------------------
     if atari:
         # Reset the base environment, providing a seed
-        env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+        if seed is not None:
+            env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+        else:
+            env.unwrapped.envs[0].unwrapped.reset()   
         # Reset vec_env
         state = env.reset()
         env.action_space.seed(int(seed))
@@ -367,7 +370,10 @@ def generate_episode(
     #--------------------------------------------------------
     if atari:
         # Reset the base environment, providing a seed
-        env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+        if seed is not None:
+            env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+        else:
+            env.unwrapped.envs[0].unwrapped.reset()  
         # Reset vec_env
         state = env.reset()
         env.action_space.seed(int(seed))
