@@ -13,6 +13,7 @@ def make(
     elif name == 'CartPole-v1':
         if max_angle is None: max_angle=1.57
         env.spec.disable_env_checker = True
+        env.spec.max_episode_steps = 1000
         env = CartPoleMod(env=env, num_bins=num_bins, sqrt_trans=sqrt_trans, 
                           max_angle=max_angle, record_states=record_states)
     elif name == 'Blackjack-v1':
