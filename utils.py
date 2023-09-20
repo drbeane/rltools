@@ -672,50 +672,93 @@ def sb3_training_curves(eval_env, start=1, fs=[10,2], n=100):
     plt.grid()
     plt.show()
 
-def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None):
+def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None, ps=60):
     import numpy as np
     import matplotlib.pyplot as plt
     
+    #------------------------------------------------------------
+    # Load the evaluation log
+    #------------------------------------------------------------
     data = np.load(path + 'evaluations.npz')
     _ = data['timesteps']
 
+    #------------------------------------------------------------
+    # Obtain and flatten lengths and scores for evaluation rounds
+    #------------------------------------------------------------
     lengths = data['ep_lengths']
     scores = data['results']
-
     scores_flat = scores.reshape(-1)
     lengths_flat = lengths.reshape(-1)
 
+    #------------------------------------------------------------
+    # Determine mean score and length for each evaluation round
+    #------------------------------------------------------------
     mean_lengths = lengths.mean(axis=1)
     mean_scores = scores.mean(axis=1)
-    best = mean_scores.max()
-    best_idx = mean_scores.argmax()
 
+    #------------------------------------------------------------
+    # Identify models representing best scores
+    #------------------------------------------------------------
+    bests = [
+        True if i==0 else mean_scores[i] > mean_scores[:i].max()
+         for i in range(len(mean_scores))
+    ]
+    
+    #------------------------------------------------------------
+    # Set rounds list and set starting round for plot
+    #------------------------------------------------------------
+    rounds = np.arange(start, len(mean_scores) + 1)
+    bests = bests[start-1:]
+    mean_scores = mean_scores[start-1:]
+    mean_lengths = mean_lengths[start-1:]
+    scores_flat = scores_flat[c*(start-1):]
+    lengths_flat = lengths_flat[c*(start-1):]
+
+    #------------------------------------------------------------
+    # Create repeated round array for plotting indiv eval results
+    #------------------------------------------------------------
     r, c = scores.shape
-    repeated_timesteps = np.repeat(np.arange(start, r + 1), c)
+    repeated_timesteps = np.repeat(rounds, c)
     
     plt.figure(figsize=fs)
+    
+    #------------------------------------------------------------
+    # Plot individual evaluation results 
+    #------------------------------------------------------------
     plt.scatter(
         repeated_timesteps,
-        scores_flat[c*(start-1):], alpha=0.6, s=2, c='darkgray', zorder=2
+        scores_flat, alpha=0.6, s=2, c='darkgray', zorder=2
     )
-    plt.scatter(best_idx + 1, best, c='gold', alpha=0.99, zorder=3, s=80, label='Best Mean Return')
-    plt.plot(np.arange(start, r+1), mean_scores[start-1:], zorder=4)
+    
+    #------------------------------------------------------------
+    # Display best models
+    #------------------------------------------------------------
+    plt.scatter(rounds[bests], mean_scores[bests], c='darkorange', alpha=0.60, zorder=3, s=60, label='Best Mean Returns')
+    
+    #------------------------------------------------------------
+    # Create line plot for best mean returns
+    #------------------------------------------------------------
+    plt.plot(rounds, mean_scores, zorder=4)
+    
     plt.legend()
     if ylim is not None:
         plt.ylim(ylim)
-    plt.xlabel('Episode')
+    plt.xlabel('Evaluation Round')
     plt.ylabel('Return')
     plt.title('Returns for Evaluation Environment During Training')
     plt.grid()
     plt.show()
     
+    #------------------------------------------------------------
+    # Add a similar plot for the lenghts.
+    #------------------------------------------------------------
     plt.figure(figsize=fs)
     plt.scatter(
         repeated_timesteps,
-        lengths_flat[c*(start-1):], alpha=0.6, s=2, c='darkgray', zorder=2
+        lengths_flat, alpha=0.6, s=2, c='darkgray', zorder=2
     )
-    plt.plot(np.arange(start, r+1), mean_lengths[start-1:], zorder=4)
-    plt.xlabel('Episode')
+    plt.plot(rounds, mean_lengths, zorder=4)
+    plt.xlabel('Evaluation Round')
     plt.ylabel('Episode Length')
     plt.title('Episode Lengths for Evaluation Environment During Training')
     plt.grid()

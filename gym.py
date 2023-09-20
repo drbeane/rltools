@@ -22,6 +22,8 @@ def make(
         env = TaxiMod(env=env)
     elif name == 'CliffWalking-v0':
         env = CliffWalkMod(env=env)
+    elif name == 'Pendulum-v1':
+        env = PendulumMod(env=env)
     return env
 
        
@@ -283,27 +285,34 @@ class BlackjackMod(ogym.Wrapper):
     
     def step(self, action):
         state, reward, terminated, truncated, info = self.env.step(action)
-        
         if terminated:
             if reward == 1:
                 self.status = 'success'
             else:
                 self.status = 'failed'
-        
         return state, reward, terminated, truncated, info    
     
     def get_states(self):
-        
         states = []
-        
         for a in range(4, 31):
             for b in range(2, 12):
                 for c in range(0, 2):
                     states.append((a, b, c))
-            
-        
         return states
-        
+
+class PendulumMod(ogym.Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+    
+    def step(self, action):
+        import numpy as np
+        if not isinstance(action, np.ndarray) and not isinstance(action, list):
+            action = [action]
+        state, reward, terminated, truncated, info = self.env.step(action)
+        return state, reward, terminated, truncated, info    
+    
+    
+     
 class TaxiMod(ogym.Wrapper):
     
     def __init__(self, env):

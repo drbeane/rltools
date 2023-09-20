@@ -106,6 +106,7 @@ class REINFORCE():
             #--------------------------------------------
             action, log_prob = self.sample_action(state, return_log_prob=True)
             if self.vec_env == False:
+                print(action)
                 state, reward, terminated, truncated, info = self.env.step(action)
             else:
                 state, reward, terminated, truncated, info = self.env.step([action])
