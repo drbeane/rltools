@@ -707,7 +707,8 @@ def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None, ps=60):
     #------------------------------------------------------------
     # Set rounds list and set starting round for plot
     #------------------------------------------------------------
-    rounds = np.arange(start, len(mean_scores) + 1)
+    r, c = scores.shape
+    rounds = np.arange(start, r + 1)
     bests = bests[start-1:]
     mean_scores = mean_scores[start-1:]
     mean_lengths = mean_lengths[start-1:]
@@ -717,7 +718,6 @@ def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None, ps=60):
     #------------------------------------------------------------
     # Create repeated round array for plotting indiv eval results
     #------------------------------------------------------------
-    r, c = scores.shape
     repeated_timesteps = np.repeat(rounds, c)
     
     plt.figure(figsize=fs)
@@ -733,7 +733,8 @@ def sb3_evaluation_curves(path, start=1, fs=[10,2], ylim=None, ps=60):
     #------------------------------------------------------------
     # Display best models
     #------------------------------------------------------------
-    plt.scatter(rounds[bests], mean_scores[bests], c='darkorange', alpha=0.60, zorder=3, s=60, label='Best Mean Returns')
+    plt.scatter(rounds[bests], mean_scores[bests], c='darkorange', 
+                alpha=0.60, zorder=3, s=ps, label='Best Mean Returns')
     
     #------------------------------------------------------------
     # Create line plot for best mean returns
