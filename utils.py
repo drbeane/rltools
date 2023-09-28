@@ -326,7 +326,7 @@ def create_gif_temp(
         # Reset the base environment, providing a seed
         if seed is not None:
             env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
-            env.action_space.seed(int(seed)) 
+            env.action_space.seed(int(seed))
         else:
             env.unwrapped.envs[0].unwrapped.reset()   
         # Reset vec_env
@@ -344,7 +344,10 @@ def create_gif_temp(
     # Create list to store frames
     #--------------------------------------------------------
     frames = []
-    frames.append(processor(env.render()) )
+    frame = processor(env.render())
+    if scale is not None:
+        frame = cv2.resize(frame, dsize=(0,0), fx=scale, fy=scale)
+    frames.append(frame)
 
     #--------------------------------------------------------
     # Loop for max steps episodes
