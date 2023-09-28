@@ -284,11 +284,12 @@ def create_gif(
 
 def create_gif_temp(
     env, agent, actions=None, max_steps=1000, seed=None, fps=None,
-    folder='', filename='', processor=None, display_gif=True, atari=False
+    folder='', filename='', processor=None, display_gif=True, atari=False, scale=None
     ):
     
     import os
     import numpy as np
+    import cv2
     import imageio
     from IPython.display import Image, display, HTML
     
@@ -395,7 +396,10 @@ def create_gif_temp(
         #--------------------------------------------------------
         # Add new frame
         #-------------------------------------------------------
-        frames.append(processor(env.render()))
+        frame = processor(env.render())
+        if scale is not None:
+            frame = cv2.resize(frame, dsize=(0,0), fx=scale, fy=scale)
+        frames.append(frame)
         if done:
             break
 
@@ -403,7 +407,7 @@ def create_gif_temp(
     # Add 2 seconds of static frames at end
     #-------------------------------------------------------
     for i in range(2 * fps):
-        frames.append(processor(env.render()))
+        frames.append(processor(frame))
 
     #--------------------------------------------------------
     # Print episode information
