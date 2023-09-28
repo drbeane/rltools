@@ -280,6 +280,158 @@ def create_gif(
     unset_seed(np_state)
 
 
+
+
+def create_gif_temp(
+    env, agent, actions=None, max_steps=1000, seed=None, fps=None,
+    folder='', filename='', processor=None, display_gif=True, atari=False
+    ):
+    
+    import os
+    import numpy as np
+    import imageio
+    from IPython.display import Image, display, HTML
+    
+    if atari:
+        from stable_baselines3.common.vec_env import VecFrameStack
+        from stable_baselines3.common.atari_wrappers import AtariWrapper   
+        from stable_baselines3.common.vec_env import DummyVecEnv 
+
+    if actions is None:
+        if max_steps is None: max_steps = float('inf')
+    else:
+        max_steps = len(actions)
+    if processor is None: processor = lambda x : x
+
+    #-----------------------------------------------------------------------
+    # Determine FPS if not provided
+    #-----------------------------------------------------------------------
+    if atari:
+        fps = 50    
+    if fps is None:
+        fps_lu = {'Taxi-v3':2, 'CliffWalking-v0':3, 'FrozenLake-v1':4, 'CartPole-v1':40}
+        fps = fps_lu.get(env.spec.id, 20)
+
+            
+    #-----------------------------------------------------------------------
+    # Set Seeds
+    #-----------------------------------------------------------------------    
+    np_state = set_seed(seed)
+    
+    #--------------------------------------------------------
+    # Reset Environment
+    #--------------------------------------------------------
+    if atari:
+        # Reset the base environment, providing a seed
+        if seed is not None:
+            env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+            env.action_space.seed(int(seed))
+        else:
+            env.unwrapped.envs[0].unwrapped.reset()   
+        # Reset vec_env
+        state = env.reset()
+        
+    else:
+        if seed is not None:
+            state, info = env.reset(seed=int(seed))
+            env.action_space.seed(int(seed))
+        else:
+            state, info = env.reset()
+        
+
+    #--------------------------------------------------------
+    # Create list to store frames
+    #--------------------------------------------------------
+    frames = []
+    frames.append(processor(env.render()) )
+
+    #--------------------------------------------------------
+    # Loop for max steps episodes
+    #--------------------------------------------------------
+    t = 0
+    total_reward = 0
+    lives = None            # Used to track when life lost for Atari
+    new_lives = None        # Used to track when life lost for Atari
+    while t < max_steps:
+        t += 1
+        
+        #--------------------------------------------------------
+        # Select action
+        #--------------------------------------------------------
+        if actions is None:
+            action = agent.select_action(state)
+        else: 
+            action = actions[t-1]
+        
+        #--------------------------------------------------------
+        # Check to see if reset is needed for Atari Environment
+        # Required when a life is lost
+        #--------------------------------------------------------
+        if atari:
+            if t == 2:              
+                lives = new_lives   # Both start as None
+            if lives != new_lives:
+                action = 1                
+            lives = new_lives
+        
+        #--------------------------------------------------------
+        # Apply action
+        #-------------------------------------------------------
+        if atari:
+            # SB3 models will retun the action in a list already
+            # But random agents will not. 
+            if not isinstance(action, np.ndarray) and not isinstance(action, list):
+                action = [action]
+            state, reward, done, info = env.step(action)
+            reward = reward[0]
+            done = done[0]
+            new_lives = info[0]['lives']
+        else:          
+            state, reward, done, truncated, info = env.step(action)
+        
+        total_reward += reward
+        
+        
+        #--------------------------------------------------------
+        # Add new frame
+        #-------------------------------------------------------
+        frames.append(processor(env.render()))
+        if done:
+            break
+
+    #--------------------------------------------------------
+    # Add 2 seconds of static frames at end
+    #-------------------------------------------------------
+    for i in range(2 * fps):
+        frames.append(processor(env.render()))
+
+    #--------------------------------------------------------
+    # Print episode information
+    #-------------------------------------------------------
+    print(f'{t} steps completed.')
+    print(f'Cumulative reward: {round(total_reward,4)}')
+    try:
+        print(env.status.title())
+    except:
+        pass
+    
+    #--------------------------------------------------------
+    # Create the Gif
+    #-------------------------------------------------------
+    os.makedirs(folder, exist_ok=True)
+    imageio.mimsave(f'{folder}/{filename}.gif', frames, format='GIF', duration=1000/fps, loop=0)   
+
+    if display_gif:
+        with open(f'{folder}/{filename}.gif','rb') as f:
+            display(Image(data=f.read(), format='png'))
+
+    #------------------------------------------------------------
+    # Unset the seed
+    #------------------------------------------------------------
+    unset_seed(np_state)
+
+
+
 def create_gif_old(
     env, agent=None, actions=None, episodes=1, max_steps=250, seed=None, fps=None, vec_env=False,
     folder='', filename='', processor=None, display_gif=True
