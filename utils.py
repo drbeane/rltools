@@ -131,7 +131,7 @@ def record_episode(
         print('uh..')
 
 
-def create_gif(
+def create_gif_bu(
     env, agent, actions=None, max_steps=1000, seed=None, fps=None,
     folder='', filename='', processor=None, display_gif=True, atari=False, scale=None
     ):
@@ -287,11 +287,9 @@ def create_gif(
     unset_seed(np_state)
 
 
-
-
-def create_gif_temp(
+def create_gif(
     env, agent, actions=None, max_steps=1000, seed=None, fps=None,
-    folder='', filename='', processor=None, display_gif=True, scale=None
+    folder='', filename='', processor=None, display_gif=True, scale=None, num_colors=None, 
     ):
     
     import os
@@ -304,13 +302,18 @@ def create_gif_temp(
         if max_steps is None: max_steps = float('inf')
     else:
         max_steps = len(actions)
+    
     if processor is None: processor = lambda x : x
+    def full_processor(x):
+        x = processor(x)
+        if scale is not None:
+            x = cv2.resize(x, dsize=(0,0), fx=scale, fy=scale)        
+        return x
 
     #-----------------------------------------------------------------------
     # Check to see if environment is framestacked
     #-----------------------------------------------------------------------
-    if 'VecFrameStack' in str(type(env)):
-        frame_stacked = True
+    frame_stacked = True if 'VecFrameStack' in str(type(env)) else False
 
     #-----------------------------------------------------------------------
     # Determine FPS if not provided
@@ -318,9 +321,9 @@ def create_gif_temp(
     if fps is not None:
         pass
     elif frame_stacked: 
-        fps = 50
+        fps = 20
     elif 'AtariEnv' in env.spec.entry_point:
-        fps = 50
+        fps = 20
     else:
         fps_lu = {'Taxi-v3':2, 'CliffWalking-v0':3, 'FrozenLake-v1':4, 'CartPole-v1':40}
         fps = fps_lu.get(env.spec.id, 20)
@@ -356,9 +359,7 @@ def create_gif_temp(
     # Create list to store frames
     #--------------------------------------------------------
     frames = []
-    frame = processor(env.render())
-    if scale is not None:
-        frame = cv2.resize(frame, dsize=(0,0), fx=scale, fy=scale)
+    frame = full_processor(env.render())
     frames.append(frame)
 
     #--------------------------------------------------------
@@ -411,9 +412,7 @@ def create_gif_temp(
         #--------------------------------------------------------
         # Add new frame
         #-------------------------------------------------------
-        frame = processor(env.render())
-        if scale is not None:
-            frame = cv2.resize(frame, dsize=(0,0), fx=scale, fy=scale)
+        frame = full_processor(env.render())
         frames.append(frame)
         if done:
             break
@@ -422,7 +421,7 @@ def create_gif_temp(
     # Add 2 seconds of static frames at end
     #-------------------------------------------------------
     for i in range(2 * fps):
-        frames.append(processor(frame))
+        frames.append(frame)
 
     #--------------------------------------------------------
     # Print episode information
@@ -434,6 +433,24 @@ def create_gif_temp(
     except:
         pass
     
+
+    color_set = set()
+    for f in frames:
+        colors = np.unique(f)
+        color_set = color_set.union(colors)
+
+    if num_colors is not None:
+        from sklearn.cluster import KMeans
+        X = np.array(frames[:10]).reshape(-1,3)
+        kmeans = KMeans(n_clusters=num_colors, random_state=0, n_init="auto", max_iter=100, tol=1e-2).fit(X)
+        og_shape = frames[0].shape
+        centers = kmeans.cluster_centers_.astype(np.uint8)
+        frames = [
+            centers[kmeans.predict(f.reshape(-1,3))].reshape(og_shape)
+            for f in frames
+        ]
+
+
     #--------------------------------------------------------
     # Create the Gif
     #-------------------------------------------------------
@@ -449,6 +466,21 @@ def create_gif_temp(
     #------------------------------------------------------------
     unset_seed(np_state)
 
+    return frames
+
+def set_seed(seed):
+    import numpy as np
+    if seed is None:
+        return None
+    np_state = np.random.get_state()
+    np.random.seed(seed)
+    return np_state
+
+def unset_seed(np_state):
+    import numpy as np
+    if np_state is None:
+        return None
+    np.random.set_state(np_state)
 
 
 
