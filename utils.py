@@ -466,7 +466,6 @@ def create_gif(
     #------------------------------------------------------------
     unset_seed(np_state)
 
-    return frames
 
 def set_seed(seed):
     import numpy as np
