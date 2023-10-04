@@ -323,7 +323,7 @@ def create_gif(
     elif frame_stacked: 
         fps = 20
     elif 'AtariEnv' in env.spec.entry_point:
-        fps = 20
+        fps = 50
     else:
         fps_lu = {'Taxi-v3':2, 'CliffWalking-v0':3, 'FrozenLake-v1':4, 'CartPole-v1':40}
         fps = fps_lu.get(env.spec.id, 20)
