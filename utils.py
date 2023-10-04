@@ -571,6 +571,33 @@ def generate_episode(
     #--------------------------------------------------------
     np_state = set_seed(seed)
     
+    
+    #-----------------------------------------------------------------------
+    # Check to see if environment is framestacked
+    #-----------------------------------------------------------------------
+    frame_stacked = True if 'VecFrameStack' in str(type(env)) else False
+    
+    #--------------------------------------------------------
+    # Reset Environment
+    #--------------------------------------------------------
+    if frame_stacked:
+        # Reset the base environment, providing a seed
+        if seed is not None:
+            env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
+            env.action_space.seed(int(seed))
+        else:
+            env.unwrapped.envs[0].unwrapped.reset()   
+        # Reset vec_env
+        state = env.reset()
+        
+    else:
+        if seed is not None:
+            state, info = env.reset(seed=int(seed))
+            env.action_space.seed(int(seed))
+        else:
+            state, info = env.reset()
+    
+    '''
     #--------------------------------------------------------
     # Reset Environment
     #--------------------------------------------------------
@@ -590,7 +617,8 @@ def generate_episode(
             env.action_space.seed(int(seed))
         else:
             state, info = env.reset(seed=int(seed))
-                    
+    '''
+                        
     #--------------------------------------------------------
     # Set initial state (Used for exploring starts)
     #--------------------------------------------------------
