@@ -671,7 +671,7 @@ def generate_episode(
         # Check to see if reset is needed for Atari Environment
         # Required when a life is lost
         #--------------------------------------------------------
-        if atari:
+        if frame_stacked:
             if t == 2:              
                 lives = new_lives   # Both start as None
             if lives != new_lives:
@@ -682,7 +682,7 @@ def generate_episode(
         #--------------------------------------------------------
         # Apply action
         #--------------------------------------------------------
-        if atari:
+        if frame_stacked:
             # SB3 models will retun the action in a list already
             # But random agents will not. 
             if not isinstance(action, np.ndarray) and not isinstance(action, list):
