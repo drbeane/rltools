@@ -130,7 +130,7 @@ class FrozenLakeMod(ogym.Wrapper):
         display(HTML('<b>State-Value Function</b>'))
         #print(V_array)
         
-        html = '<table style="border-spacing: 0px; text-align: center">'
+        html = '<table style="border-spacing: 0px; border-collapse: collapse; text-align: center">'
         for r in range(V_array.shape[0]):
             html += '<tr>'
             for c in range(V_array.shape[1]):
