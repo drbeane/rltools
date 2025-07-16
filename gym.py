@@ -106,8 +106,8 @@ class FrozenLakeMod(ogym.Wrapper):
             if s % n == 0:
                 print('+---'*n + '+')
 
-            if s == 0: glyph = 'S'
-            elif s == num_states-1: glyph = 'G'
+            #if s == 0: glyph = 'S'
+            if s == num_states-1: glyph = 'G'
             elif self.P[s][0][0][0] == 1.0: glyph = 'H'
             else:
                 glyph = dir_dict[policy[s]]
