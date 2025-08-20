@@ -3,8 +3,12 @@ import gymnasium as ogym
 def make(
     name, prob=None, rew_struct=None, size=None, 
     num_bins=None, max_angle=None, sqrt_trans=False, coord_max=None,
-    record_states=False,
+    record_states=False, supress_warnings=True,
     **kwargs):
+    
+    if supress_warnings:
+        import warnings
+        warnings.filterwarnings("ignore")
     
     env = ogym.make(name, disable_env_checker=True, **kwargs)
     if name == 'FrozenLake-v1':
