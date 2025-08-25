@@ -38,7 +38,18 @@ class SB3Agent:
 
 class RandomAgent:
     def __init__(self, env, seed=None):
-        self.env = env
+        
+        #------------------------------------
+        # Temp code to account for versions
+        #------------------------------------
+        import gymnasium as gym_test
+        old_version = False
+        if ogym.__version__ == '0.28.1':
+            old_version = True
+            
+        
+        self.env = env if old_version else env.env
+        
         self.seed = seed
         if seed is not None:
             self.env.action_space.seed(seed)
