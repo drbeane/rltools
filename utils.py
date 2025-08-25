@@ -38,23 +38,15 @@ class SB3Agent:
 
 class RandomAgent:
     def __init__(self, env, seed=None):
-        
-        #------------------------------------
-        # Temp code to account for versions
-        #------------------------------------
-        import gymnasium as gym_test
-        old_version = False
-        if gym_test.__version__ == '0.28.1':
-            old_version = True
-            
-        
-        self.env = env if old_version else env.env
+     
+        self.env = env 
         
         self.seed = seed
         if seed is not None:
-            self.env.action_space.seed(seed)
+            self.env.env.action_space.seed(seed)
+            
     def select_action(self, state):
-        return self.env.action_space.sample()
+        return self.env.env.action_space.sample()
 
 class DictAgent:
     def __init__(self, env, policy):
