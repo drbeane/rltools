@@ -1,5 +1,11 @@
 import gymnasium as ogym
 
+old_version = False
+if ogym.__version__ == '0.28.1':
+    old_version = True
+    
+
+
 def make(
     name, prob=None, rew_struct=None, size=None, 
     num_bins=None, max_angle=None, sqrt_trans=False, coord_max=None,
@@ -97,22 +103,28 @@ class FrozenLakeMod(ogym.Wrapper):
         states = range(self.observation_space.n)
         actions =  range(4)
         
+        
+        TM = self.P if old_version else self.unwrapped.P
+        
         for s in states:
             for a in actions:
-                T = self.P[s][a]
+                T = TM[s][a]
                 self.set_T(T)
 
     def display_policy(self, policy):
         dir_dict = {0:'←', 1:'↓', 2:'→', 3:'↑'}
         num_states = self.observation_space.n
         n = round(num_states**0.5)
+        
+        TM = self.P if old_version else self.unwrapped.P
+        
         for s in range(num_states):
             if s % n == 0:
                 print('+---'*n + '+')
 
             #if s == 0: glyph = 'S'
             if s == num_states-1: glyph = 'G'
-            elif self.P[s][0][0][0] == 1.0: glyph = 'H'
+            elif TM[s][0][0][0] == 1.0: glyph = 'H'
             else:
                 glyph = dir_dict[policy[s]]
 
@@ -134,6 +146,8 @@ class FrozenLakeMod(ogym.Wrapper):
         display(HTML('<b>State-Value Function</b>'))
         #print(V_array)
         
+        TM = self.P if old_version else self.unwrapped.P
+        
         html = '<table style="border-spacing: 0px; border-collapse: collapse; text-align: center">'
         for r in range(V_array.shape[0]):
             html += '<tr>'
@@ -144,7 +158,7 @@ class FrozenLakeMod(ogym.Wrapper):
                     bgc = 'LightBlue'
                 elif state == V_array.size - 1:
                     bgc = 'LightGreen'
-                elif len(self.env.P[state][0]) == 1:
+                elif len(TM[state][0]) == 1:
                     bgc = '#bbbbbb'
                 html += f'<td width={cell_width}, height={cell_height}, '
                 html += f'style="border-style:solid; border-width:thin; background-color: {bgc}">'
@@ -250,14 +264,17 @@ class CliffWalkMod(ogym.Wrapper):
     def __init__(self, env):
         super().__init__(env)
         self.status = None
-        for s in self.P.keys():
-            for a in self.P[s].keys():
-                t0, t1, t2, t3 = self.P[s][a][0]
+        
+        TM = self.P if old_version else self.unwrapped.P
+        
+        for s in TM.keys():
+            for a in TM[s].keys():
+                t0, t1, t2, t3 = TM[s][a][0]
                 if t2 == -100:
-                    self.P[s][a][0] = (t0, t1, t2, True)
+                    TM[s][a][0] = (t0, t1, t2, True)
         for s in range(37, 48):
             for a in range(4):
-                self.P[s][a][0] = (1.0, s, 0, True)
+                TM[s][a][0] = (1.0, s, 0, True)
 
     def get_states(self):
         return range(self.observation_space.n)
