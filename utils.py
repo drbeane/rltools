@@ -600,28 +600,7 @@ def generate_episode(
         else:
             state, info = env.reset()
     
-    '''
-    #--------------------------------------------------------
-    # Reset Environment
-    #--------------------------------------------------------
-    if atari:
-        # Reset the base environment, providing a seed
-        if seed is not None:
-            env.unwrapped.envs[0].unwrapped.reset(seed=int(seed))  
-            env.action_space.seed(int(seed))
-        else:
-            env.unwrapped.envs[0].unwrapped.reset()  
-        # Reset vec_env
-        state = env.reset()
-    
-    else:
-        if seed is not None:
-            state, info = env.reset(seed=int(seed))
-            env.action_space.seed(int(seed))
-        else:
-            state, info = env.reset(seed=int(seed))
-    '''
-                        
+         
     #--------------------------------------------------------
     # Set initial state (Used for exploring starts)
     #--------------------------------------------------------
@@ -764,7 +743,7 @@ def state_str(env, state):
     '''
     import numpy as np
     np.set_printoptions(suppress=True)
-    if env.spec.id == 'CartPole-v1':
+    if env.unwrapped.spec.id == 'CartPole-v1':
         ss = str(state.round(3))
     else:
         ss = str(state)
@@ -784,7 +763,7 @@ def encode_state(state):
 
 def decode_state(env, state):
     import numpy as np
-    if env.spec.id == 'FrozenLake-v1':
+    if env.unwrapped.spec.id == 'FrozenLake-v1':
         return int(state)
     
 
