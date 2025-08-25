@@ -12,7 +12,7 @@ class DPAgent:
         #--------------------------------------------------------
         # Get state information from environment.
         #--------------------------------------------------------
-        self.states = self.env.unwrapped.get_states()
+        self.states = self.env.get_states()
         self.num_states = env.observation_space.n
         
         #--------------------------------------------------------
