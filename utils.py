@@ -596,7 +596,7 @@ def generate_episode(
     else:
         if seed is not None:
             state, info = env.reset(seed=int(seed))
-            env.action_space.seed(int(seed))
+            env.unwrapped.action_space.seed(int(seed))
         else:
             state, info = env.reset()
     
