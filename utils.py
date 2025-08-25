@@ -44,7 +44,7 @@ class RandomAgent:
         #------------------------------------
         import gymnasium as gym_test
         old_version = False
-        if ogym.__version__ == '0.28.1':
+        if gym_test.__version__ == '0.28.1':
             old_version = True
             
         
