@@ -12,7 +12,7 @@ class DPAgent:
         #--------------------------------------------------------
         # Get state information from environment.
         #--------------------------------------------------------
-        self.states = self.env.get_states()
+        self.states = self.env.unwrapped.get_states()
         self.num_states = env.observation_space.n
         
         #--------------------------------------------------------
@@ -69,7 +69,7 @@ class DPAgent:
                 
                 # Select action and then get transitions P(s,a)
                 a = self.policy[s]
-                transitions = self.env.P[s][a]
+                transitions = self.env.unwrapped.P[s][a]
                 
                 # Loop over all transitions
                 Vs = 0
@@ -97,7 +97,7 @@ class DPAgent:
         '''
         for s in self.states:
             for a in self.actions:
-                trans = self.env.P[s][a]
+                trans = self.env.unwrapped.P[s][a]
                 Qsa = 0
                 for prob, s_, reward, done in trans:
                     G_est = reward + (0 if done else self.gamma * self.V[s_])
