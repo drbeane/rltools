@@ -27,7 +27,7 @@ class TDAgent:
         s = encode_state(state)
         if s in self.policy.keys():
             return self.policy[s]
-        return self.env.action_space.sample()
+        return self.env.unwrapped.action_space.sample()
 
 
     def q_learning(self, episodes, max_steps=None, alpha=0.1, alpha_decay=0.0,
@@ -74,7 +74,7 @@ class TDAgent:
             #------------------------------------------------------------
             gym_seed = int(np.random.choice(10**6))
             state, info = self.env.reset(seed=gym_seed)
-            self.env.action_space.seed(gym_seed)
+            self.env.unwrapped.action_space.seed(gym_seed)
             
             if exploring_starts and len(self.Q) > 0:
                 state = np.random.choice(list(self.Q.keys())) 
@@ -95,7 +95,7 @@ class TDAgent:
                 #------------------------------------------------------------
                 roll = np.random.uniform(0,1)
                 if roll < epsilon:
-                    action = self.env.action_space.sample()
+                    action = self.env.unwrapped.action_space.sample()
                 else: 
                     action = self.select_action(state)
                     
