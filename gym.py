@@ -35,10 +35,10 @@ def make(
     elif name == 'Pendulum-v1':
         env = PendulumMod(env=env)
 
-    for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
-        if attr not in dir(env):
-            value = getattr(env.unwrapped, attr)
-            setattr(env, attr, value)
+    #for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
+    #    if attr not in dir(env):
+    #        value = getattr(env.unwrapped, attr)
+    #        setattr(env, attr, value)
         
     return env
 
@@ -365,12 +365,11 @@ class TaxiMod(ogym.Wrapper):
 
 if __name__ == '__main__':
     
-    env = make("CartPole-v1", render_mode='rgb_array')
-    print(env.unwrapped.spec.disable_env_checker)
+    cp_1 = make("CartPole-v1", render_mode='rgb_array')
+    cp_2 = cp_1.unwrapped
+    cp_3 = ogym.make("CartPole-v1", render_mode='rgb_array')
     
-    env.reset()
-    while True:
-        _, _, term, _, _ = env.step(1)
-        if term:
-            break
-        
+    attr = ['action_space', 'observation_space', 'spec', 'unwrapped', '_action_space', '_observation_space']
+
+for a in attr:
+    print(f'{a:<20} {str(a in dir(cp_1)):<6} {str(a in dir(cp_2)):<6}  {str(a in dir(cp_2)):<6}')
