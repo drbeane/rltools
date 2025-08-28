@@ -37,7 +37,8 @@ def make(
     else:
         env = base_env
 
-    for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
+    #for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
+    for attr in dir(base_env):
         if attr not in dir(env):
             value = getattr(base_env, attr)
             setattr(env, attr, value)
