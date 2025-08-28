@@ -34,6 +34,12 @@ def make(
         env = CliffWalkMod(env=env)
     elif name == 'Pendulum-v1':
         env = PendulumMod(env=env)
+
+    for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
+        if attr not in dir(env):
+            value = getattr(env.unwrapped, attr)
+            setattr(env, attr, value)
+        
     return env
 
        
