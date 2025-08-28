@@ -49,7 +49,7 @@ class TDAgent:
         #------------------------------------------------------------
         # Number of actions needed for creating entries in Q
         #------------------------------------------------------------
-        num_actions = self.env.action_space.n
+        num_actions = self.env.unwrapped.action_space.n
 
         #------------------------------------------------------------
         # Create objects for storing best results
