@@ -28,7 +28,7 @@ class MCAgent:
         state = encode_state(state)
         if state in self.policy.keys():
             return self.policy[state]
-        return self.env.action_space.sample()
+        return self.unwrapped.env.action_space.sample()
    
    
     def prediction(self, policy, episodes, max_steps=None, alpha=None, alpha_decay=0.0, 
