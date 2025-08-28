@@ -16,29 +16,31 @@ def make(
         import warnings
         warnings.filterwarnings("ignore")
     
-    env = ogym.make(name, disable_env_checker=True, **kwargs)
+    base_env = ogym.make(name, disable_env_checker=True, **kwargs)
     if name == 'FrozenLake-v1':
         if rew_struct is None: rew_struct = [0,0,1]
-        env = FrozenLakeMod(env=env, prob=prob, rew_struct=rew_struct)
+        env = FrozenLakeMod(env=base_env, prob=prob, rew_struct=rew_struct)
     elif name == 'CartPole-v1':
         env = ogym.make(name, disable_env_checker=True, max_episode_steps=1000, **kwargs)
         if max_angle is None: max_angle=1.57
         env.spec.disable_env_checker = True
-        env = CartPoleMod(env=env, num_bins=num_bins, sqrt_trans=sqrt_trans, 
+        env = CartPoleMod(env=base_env, num_bins=num_bins, sqrt_trans=sqrt_trans, 
                           max_angle=max_angle, record_states=record_states)
     elif name == 'Blackjack-v1':
-        env = BlackjackMod(env=env)
+        env = BlackjackMod(env=base_env)
     elif name == 'Taxi-v3':
-        env = TaxiMod(env=env)
+        env = TaxiMod(env=base_env)
     elif name == 'CliffWalking-v0':
-        env = CliffWalkMod(env=env)
+        env = CliffWalkMod(env=base_env)
     elif name == 'Pendulum-v1':
-        env = PendulumMod(env=env)
+        env = PendulumMod(env=base_env)
+    else:
+        env = base_env
 
-    #for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
-    #    if attr not in dir(env):
-    #        value = getattr(env.unwrapped, attr)
-    #        setattr(env, attr, value)
+    for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
+        if attr not in dir(env):
+            value = getattr(base_env, attr)
+            setattr(env, attr, value)
         
     return env
 
@@ -372,4 +374,4 @@ if __name__ == '__main__':
     attr = ['action_space', 'observation_space', 'spec', 'unwrapped', '_action_space', '_observation_space']
 
     for a in attr:
-        print(f'{a:<20} {str(a in dir(cp_1)):<6} {str(a in dir(cp_2)):<6}  {str(a in dir(cp_2)):<6}')
+        print(f'{a:<20} {str(a in dir(cp_1)):<6} {str(a in dir(cp_2)):<6}  {str(a in dir(cp_3)):<6}')
