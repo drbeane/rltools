@@ -28,7 +28,7 @@ class MCAgent:
         state = encode_state(state)
         if state in self.policy.keys():
             return self.policy[state]
-        return self.unwrapped.env.action_space.sample()
+        return self.env.unwrapped.action_space.sample()
    
    
     def prediction(self, policy, episodes, max_steps=None, alpha=None, alpha_decay=0.0, 
@@ -150,7 +150,7 @@ class MCAgent:
         #------------------------------------------------------------
         # Number of actions needed for creating entries in Q
         #------------------------------------------------------------
-        num_actions = self.env.action_space.n
+        num_actions = self.env.unwrapped.action_space.n
 
         #------------------------------------------------------------
         # Create objects for storing best results
