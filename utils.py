@@ -645,7 +645,7 @@ def generate_episode(
         # Select action
         #--------------------------------------------------------
         if random_action:
-            action = env.unwerapped.action_space.sample()
+            action = env.unwrapped.action_space.sample()
         else:
             action = agent.select_action(state)
         
