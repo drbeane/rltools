@@ -371,5 +371,5 @@ if __name__ == '__main__':
     
     attr = ['action_space', 'observation_space', 'spec', 'unwrapped', '_action_space', '_observation_space']
 
-for a in attr:
-    print(f'{a:<20} {str(a in dir(cp_1)):<6} {str(a in dir(cp_2)):<6}  {str(a in dir(cp_2)):<6}')
+    for a in attr:
+        print(f'{a:<20} {str(a in dir(cp_1)):<6} {str(a in dir(cp_2)):<6}  {str(a in dir(cp_2)):<6}')
