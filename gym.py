@@ -30,14 +30,20 @@ def make(
         env = BlackjackMod(env=base_env)
     elif name == 'Taxi-v3':
         env = TaxiMod(env=base_env)
-    elif name == 'CliffWalking-v0':
+    elif name == 'CliffWalking-v1':
         env = CliffWalkMod(env=base_env)
     elif name == 'Pendulum-v1':
         env = PendulumMod(env=base_env)
     else:
         env = base_env
 
-    #for attr in ['action_space', 'observation_space', '_action_space', '_observation_space']:
+    #---------------------------------------------------------------
+    # Some attributes in base env will be missing from modded env. 
+    # These need to be copied. 
+    # Especially important for:
+    #   action_space, observation_space, 
+    #   _action_space, _observation_space
+    #---------------------------------------------------------------
     for attr in dir(base_env):
         if attr not in dir(env):
             value = getattr(base_env, attr)
