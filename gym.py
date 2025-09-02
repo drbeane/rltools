@@ -65,6 +65,7 @@ class FrozenLakeMod(ogym.Wrapper):
         self.prob = prob
         self.status = None
         self.visited = set()
+        self.P = env.unwrapped.P
         if prob is not None:
             self.set_transitions()
 
@@ -118,8 +119,8 @@ class FrozenLakeMod(ogym.Wrapper):
         states = range(self.observation_space.n)
         actions =  range(4)
         
-        
-        TM = self.P if old_version else self.unwrapped.P
+        TM = self.P
+        #TM = self.P if old_version else self.unwrapped.P
         
         for s in states:
             for a in actions:
