@@ -1,5 +1,6 @@
+import numpy as np
+
 def set_seed(seed):
-    import numpy as np
     if seed is None:
         return None
     np_state = np.random.get_state()
@@ -7,7 +8,6 @@ def set_seed(seed):
     return np_state
 
 def unset_seed(np_state):
-    import numpy as np
     if np_state is None:
         return None
     np.random.set_state(np_state)
@@ -20,6 +20,12 @@ def render_mp4(videopath):
     return f'<video width=400 controls><source src="data:video/mp4;' \
            f'base64,{base64_encoded_mp4}" type="video/mp4"></video>'
 
+
+def base_type(x):
+    if type(x) == np.str_: return str(x)
+    if type(x) == np.int64: return int(x)
+    if type(x) == np.float64: return float(x)
+    return x
 
 class SB3Agent:
     def __init__(self, model, seed=None, deterministic=True, normalizer=None): 
@@ -34,7 +40,8 @@ class SB3Agent:
         if self.normalizer is not None:
             state = self.normalizer(state)
         a = self.model.predict(state, deterministic=self.deterministic)[0]
-        return a
+        
+        return base_type(a)
 
 class RandomAgent:
     def __init__(self, env, seed=None):
@@ -46,7 +53,8 @@ class RandomAgent:
             self.env.env.action_space.seed(seed)
             
     def select_action(self, state):
-        return self.env.env.action_space.sample()
+        a = self.env.env.action_space.sample()
+        return base_type(a)
 
 class DictAgent:
     def __init__(self, env, policy):
@@ -55,7 +63,8 @@ class DictAgent:
     def select_action(self, state):
         if state in self.policy.keys():
             return self.policy[state]
-        return self.env.action_space.sample() 
+        a = self.env.action_space.sample() 
+        return base_type(a)
 
 class FnAgent:
     def __init__(self, policy):
