@@ -21,7 +21,7 @@ def make(
         if rew_struct is None: rew_struct = [0,0,1]
         env = FrozenLakeMod(env=base_env, prob=prob, rew_struct=rew_struct)
     elif name == 'CartPole-v1':
-        env = ogym.make(name, disable_env_checker=True, max_episode_steps=1000, **kwargs)
+        base_env = ogym.make(name, disable_env_checker=True, max_episode_steps=1000, **kwargs)
         if max_angle is None: max_angle=1.57
         env.spec.disable_env_checker = True
         env = CartPoleMod(env=base_env, num_bins=num_bins, sqrt_trans=sqrt_trans, 
